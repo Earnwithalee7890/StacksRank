@@ -11,11 +11,11 @@ StacksRank combines reputation tracking, atomic swaps, and secure vaults into on
 - **Direct Leather Integration**: Seamless wallet connection.
 - **Real-Time On-Chain Data**: Live balances from Hiro API.
 - **Atomic Swap Engine**: Instant price calculation.
-- **Smart Contract Verified**: Built on Clarity 2.0.
+- **Smart Contract Verified**: Built on Clarity 3 & 4.
 
 ## 🛠 Technology Stack
 - **Frontend**: Vanilla JS / HTML5
-- **Smart Contracts**: Clarity 2.0
+- **Smart Contracts**: Clarity 3 & 4 (Future-Ready)
 - **Wallet Connection**: Leather Provider API & Stacks.js v6
 
 ## 📦 Installation
