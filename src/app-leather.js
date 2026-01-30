@@ -410,11 +410,18 @@ async function executeSwap() {
         const [contractAddress, contractName] = CONTRACT_ADDRESSES.SWAP.split('.');
         const amount = Math.floor(parseFloat(amountIn) * 1000000); // Convert to microSTX
 
-        // Retrieve the signing function dynamically
-        const openContractCall = window.StacksConnect?.openContractCall || window.openContractCall;
+        // Retrieve the signing function dynamically with multiple fallback checks
+        let openContractCall = null;
+        if (window.StacksConnect && window.StacksConnect.openContractCall) {
+            openContractCall = window.StacksConnect.openContractCall;
+        } else if (window.connect && window.connect.openContractCall) {
+            openContractCall = window.connect.openContractCall;
+        }
 
         if (!openContractCall) {
-            throw new Error('Wallet signing library not found. Please ensure Leather wallet is installed and unlocked.');
+            // Last ditch effort: notify user to check console for debugging
+            console.error('Available globals:', Object.keys(window).filter(k => k.includes('Stack') || k.includes('connect')));
+            throw new Error('Wallet signing library (StacksConnect) not found. Please reload or ensure Leather is active.');
         }
 
         await openContractCall({
