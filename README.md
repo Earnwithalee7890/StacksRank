@@ -5,6 +5,8 @@
 > **Build, Compete, and Earn on Bitcoin L2.**  
 > StacksRank is the premier reputation tracking and DeFi orchestration platform built exclusively for the **Talent Protocol Stacks Builder Rewards** event.
 
+[**🔴 Live Demo**](https://stacks-rank.vercel.app/)
+
 [![Stacks](https://img.shields.io/badge/Stacks-Clarity%203%20%26%204-5546FF?style=for-the-badge&logo=stacks)](https://stacks.co)
 [![Wallet](https://img.shields.io/badge/Wallet-Leather-121212?style=for-the-badge&logo=wallet)](https://leather.io)
 [![DeFi](https://img.shields.io/badge/DeFi-Atomic%20Swaps-success?style=for-the-badge)](https://stacks.co)

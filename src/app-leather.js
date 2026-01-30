@@ -410,47 +410,46 @@ async function executeSwap() {
         const [contractAddress, contractName] = CONTRACT_ADDRESSES.SWAP.split('.');
         const amount = Math.floor(parseFloat(amountIn) * 1000000); // Convert to microSTX
 
-        if (window.openContractCall) {
-            await openContractCall({
-                network,
-                contractAddress,
-                contractName,
-                functionName: 'create-swap',
-                functionArgs: [
-                    principalCV(connectedAddress), // counterparty
-                    uintCV(amount),
-                    uintCV(144) // 24 hours
-                ],
-                appDetails,
-                onFinish: (data) => {
-                    console.log('✅ Swap created!', data);
-                    showNotification(`✅ Swap created successfully!`, 'success');
-                    document.getElementById('swapAmountIn').value = '';
-                    document.getElementById('swapAmountOut').value = '';
-                    btn.disabled = false;
-                    btn.textContent = 'Swap Tokens';
-                    updateStats();
-                },
-                onCancel: () => {
-                    showNotification('❌ Swap cancelled', 'info');
-                    btn.disabled = false;
-                    btn.textContent = 'Swap Tokens';
-                }
-            });
-        } else {
-            // Demo Fallback if Contract Call not available
-            console.warn('⚠️ Stacks Connect not found, performing demo swap');
-            setTimeout(() => {
-                showNotification(`✅ Demo Swap Complete! (Mode: Simulation)`, 'success');
+        // Retrieve the signing function dynamically
+        const openContractCall = window.StacksConnect?.openContractCall || window.openContractCall;
+
+        if (!openContractCall) {
+            throw new Error('Wallet signing library not found. Please ensure Leather wallet is installed and unlocked.');
+        }
+
+        await openContractCall({
+            network,
+            contractAddress,
+            contractName,
+            functionName: 'create-swap',
+            functionArgs: [
+                principalCV(connectedAddress), // counterparty
+                uintCV(amount),
+                uintCV(144) // 24 hours
+            ],
+            appDetails,
+            onFinish: (data) => {
+                console.log('✅ Swap transaction broadcast!', data);
+                // Show TXID if available
+                const txId = data.txId || 'submitted';
+                showNotification(`✅ Swap transaction submitted! (${txId.slice(0, 6)}...)`, 'success');
+
                 document.getElementById('swapAmountIn').value = '';
                 document.getElementById('swapAmountOut').value = '';
                 btn.disabled = false;
                 btn.textContent = 'Swap Tokens';
-            }, 2000);
-        }
+                updateStats();
+            },
+            onCancel: () => {
+                showNotification('❌ Swap cancelled', 'info');
+                btn.disabled = false;
+                btn.textContent = 'Swap Tokens';
+            }
+        });
+
     } catch (error) {
         console.error('❌ Swap error:', error);
-        showNotification('❌ Swap failed', 'error');
+        showNotification(error.message || '❌ Swap transaction failed', 'error');
         const btn = document.getElementById('executeSwapBtn');
         if (btn) {
             btn.disabled = false;
