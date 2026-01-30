@@ -8,3 +8,6 @@
 ## Tech Stack
 - Stacks.js
 - Clarity
+
+## Installation
+Run python -m http.server
