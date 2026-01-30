@@ -3,22 +3,31 @@
 ![StacksRank Header](https://raw.githubusercontent.com/Earnwithalee7890/StacksRank/main/public/header.png)
 
 > **Build, Compete, and Earn on Bitcoin L2.**  
-> StacksRank is the premier reputation tracking and DeFi orchestration platform built exclusively for the **Talent Protocol Stacks Builder Rewards** event.
+> StacksRank is the premier reputation tracking and DeFi orchestration platform built exclusively for the **Stacks Builder Rewards (Jan 2026)** campaign by Talent Protocol.
 
 [**🔴 Live Demo**](https://stacks-rank.vercel.app/)
 
 [![Stacks](https://img.shields.io/badge/Stacks-Clarity%203%20%26%204-5546FF?style=for-the-badge&logo=stacks)](https://stacks.co)
-[![Wallet](https://img.shields.io/badge/Wallet-Leather-121212?style=for-the-badge&logo=wallet)](https://leather.io)
-[![DeFi](https://img.shields.io/badge/DeFi-Atomic%20Swaps-success?style=for-the-badge)](https://stacks.co)
+[![Reward Pool](https://img.shields.io/badge/Reward%20Pool-15%2C300%20STX-success?style=for-the-badge&logo=bitcoin)](https://talentprotocol.com)
 [![Event](https://img.shields.io/badge/Event-Talent%20Protocol-purple?style=for-the-badge)](https://talentprotocol.com)
 
 ---
 
 ## 🚀 About The Project
 
-**StacksRank** isn't just a leaderboard; it's a dedicated engine for the Stacks builder economy. 
+**StacksRank** is engineered to be the ultimate companion for the **Stacks Builder Rewards** campaign (Jan 19-31). 
 
-In the rapidly growing Bitcoin L2 ecosystem, recognizing top talent and providing them with trustworthy tools is paramount. **StacksRank** bridges this gap by combining three powerful pillars into one seamless decentralized application:
+With a total prize pool of **15,300 STX** distributed to high-impact developers, StacksRank serves as both a demonstration of technical excellence and a tool for builders to track their standing.
+
+### 🎯 Built for the Leaderboard
+This project is meticulously crafted to maximize the **tier-ranking criteria** defined in the campaign FAQ:
+
+1.  **✅ High-Impact Smart Contracts**: Deploys complex Clarity 3 & 4 logic for Vaults and Swaps.
+2.  **✅ Essential Stacks Libraries**: Deep integration of `@stacks/connect` and `@stacks/transactions` for robust wallet interaction.
+3.  **✅ Public Contribution**: Open-source repository driving GitHub activity and ecosystem value.
+4.  **✅ Bitcoin L2 Wallet Support**: Native support for **Leather**, **Xverse**, and **Asigna** via browser injection.
+
+---
 
 1.  **🏆 Dynamic Reputation Leaderboard**:  
     We track real-time on-chain activity, contributions, and engagement to rank the top builders in the ecosystem. Your code is your resume, and StacksRank makes it visible.
