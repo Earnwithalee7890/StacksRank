@@ -410,18 +410,17 @@ async function executeSwap() {
         const [contractAddress, contractName] = CONTRACT_ADDRESSES.SWAP.split('.');
         const amount = Math.floor(parseFloat(amountIn) * 1000000); // Convert to microSTX
 
-        // Retrieve the signing function dynamically with multiple fallback checks
-        let openContractCall = null;
-        if (window.StacksConnect && window.StacksConnect.openContractCall) {
-            openContractCall = window.StacksConnect.openContractCall;
-        } else if (window.connect && window.connect.openContractCall) {
-            openContractCall = window.connect.openContractCall;
+        // Explicitly use StacksConnect global
+        console.log('🔍 Checking StacksConnect:', window.StacksConnect);
+
+        if (!window.StacksConnect) {
+            throw new Error('StacksConnect global not found. Steps to fix: 1. Unlock Leather Wallet. 2. Refresh Page.');
         }
 
+        const openContractCall = window.StacksConnect.openContractCall;
+
         if (!openContractCall) {
-            // Last ditch effort: notify user to check console for debugging
-            console.error('Available globals:', Object.keys(window).filter(k => k.includes('Stack') || k.includes('connect')));
-            throw new Error('Wallet signing library (StacksConnect) not found. Please reload or ensure Leather is active.');
+            throw new Error('openContractCall function missing from StacksConnect.');
         }
 
         await openContractCall({
