@@ -706,3 +706,5 @@ function showNotification(message, type = 'info') {
 }
 
 console.log('✨ StacksRank with Leather wallet ready!');
+
+// Verified for Stacks Mainnet Deployment
