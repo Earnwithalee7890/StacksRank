@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="StacksRank - The Ultimate Stacks Ecosystem Leaderboard & DeFi Platform with Swap and Vault features">
+  <meta name="keywords" content="Stacks, Clarity, DeFi, Leaderboard, Swap, Vault, Blockchain, Talent Protocol">
+  <title>StacksRank | Leaderboard, Swap & Vault Platform</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Leather Wallet Integration -->
+  <script type="module">
+    // Detect Leather wallet
+    window.addEventListener('load', () => {
+      if (window.LeatherProvider) {
+        console.log('✅ Leather wallet detected');
+      } else {
+        console.log('⚠️ Leather wallet not installed');
+      }
+    });
+  </script>
+
+  <!-- Stacks.js for contract interactions -->
+  <!-- Stacks.js for contract interactions (Pinned to v6 for stability) -->
+  <script src="https://unpkg.com/@stacks/auth@6.5.4/dist/auth.umd.production.min.js"></script>
+  <script src="https://unpkg.com/@stacks/connect@6.13.0/dist/connect.umd.production.min.js"></script>
+  <script src="https://unpkg.com/@stacks/transactions@6.13.0/dist/index.umd.production.min.js"></script>
+  <script src="https://unpkg.com/@stacks/network@6.13.0/dist/index.umd.production.min.js"></script>
+
+  <link rel="stylesheet" href="src/styles/globals.css">
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="nav-content">
+        <a href="/" class="logo" style="display: flex; align-items: center; gap: 0.5rem;">
+          <img src="logo.svg" alt="StacksRank" style="width: 32px; height: 32px;">
+          <span>StacksRank</span>
+        </a>
+        <ul class="nav-links">
+          <li><a href="#leaderboard" class="nav-link">Leaderboard</a></li>
+          <li><a href="#swap" class="nav-link">Swap</a></li>
+          <li><a href="#vault" class="nav-link">Vault</a></li>
+          <li><a href="#about" class="nav-link">About</a></li>
+        </ul>
+        <button class="btn btn-primary" id="connectWalletBtn">Connect Wallet</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section style="padding: 5rem 0 3rem;">
+    <div class="container">
+      <div style="text-align: center; max-width: 900px; margin: 0 auto;" class="animate-fade-in">
+        <h1 style="margin-bottom: 1.5rem;">
+          Build, Compete & Earn on Stacks
+        </h1>
+        <p style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 2rem;">
+          The ultimate platform combining on-chain reputation tracking, atomic swaps,
+          and secure vaults. Powered by Clarity 2.0 and Stacks.js 6.0.
+        </p>
+        <div class="flex-center" style="gap: 1rem; flex-wrap: wrap;">
+          <a href="#leaderboard" class="btn btn-primary">View Leaderboard</a>
+          <a href="#swap" class="btn btn-secondary">Start Swapping</a>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="grid grid-3" style="margin-top: 4rem;">
+        <div class="card stat-card">
+          <div class="stat-value" id="totalUsers">1,247</div>
+          <div class="stat-label">Total Builders</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-value" id="totalVolume">$2.4M</div>
+          <div class="stat-label">Swap Volume</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-value" id="totalLocked">$5.8M</div>
+          <div class="stat-label">Total Value Locked</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Leaderboard Section -->
+  <section id="leaderboard" style="padding: 4rem 0;">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 3rem;">
+        <h2>🏆 Builder Leaderboard</h2>
+        <p style="font-size: 1.125rem;">Real-time rankings powered by on-chain reputation</p>
+      </div>
+
+      <div class="card card-glass">
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Builder</th>
+              <th>Reputation Score</th>
+              <th>Streak</th>
+              <th>Contributions</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody">
+            <!-- Will be populated by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+
+      <div style="text-align: center; margin-top: 2rem;">
+        <button class="btn btn-primary" id="checkInBtn">✅ Daily Check-in</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Swap Section -->
+  <section id="swap" style="padding: 4rem 0; background: var(--bg-secondary);">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 3rem;">
+        <h2>💱 Atomic Swap</h2>
+        <p style="font-size: 1.125rem;">Trustless token exchanges with low slippage</p>
+      </div>
+
+      <div style="max-width: 500px; margin: 0 auto;">
+        <div class="card card-glass">
+          <div style="margin-bottom: 1.5rem;">
+            <label
+              style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.875rem; font-weight: 600; text-transform: uppercase;">You
+              Pay</label>
+            <div style="display: flex; gap: 0.5rem;">
+              <input type="number" class="input" placeholder="0.0" id="swapAmountIn" style="flex: 1;">
+              <select class="input" style="width: 120px;" id="tokenIn">
+                <option>STX</option>
+                <option>xBTC</option>
+                <option>USDA</option>
+              </select>
+            </div>
+            <div style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.875rem;">
+              Balance: <span id="balanceIn">0.00</span>
+            </div>
+          </div>
+
+          <div style="text-align: center; margin: 1rem 0;">
+            <button class="btn btn-secondary" style="padding: 0.5rem;" id="swapDirectionBtn">⇅</button>
+          </div>
+
+          <div style="margin-bottom: 1.5rem;">
+            <label
+              style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.875rem; font-weight: 600; text-transform: uppercase;">You
+              Receive</label>
+            <div style="display: flex; gap: 0.5rem;">
+              <input type="number" class="input" placeholder="0.0" id="swapAmountOut" style="flex: 1;" readonly>
+              <select class="input" style="width: 120px;" id="tokenOut">
+                <option>xBTC</option>
+                <option>STX</option>
+                <option>USDA</option>
+              </select>
+            </div>
+          </div>
+
+          <div
+            style="padding: 1rem; background: var(--bg-tertiary); border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+            <div class="flex-between" style="margin-bottom: 0.5rem;">
+              <span style="color: var(--text-muted); font-size: 0.875rem;">Rate</span>
+              <span id="swapRate">1 STX = 0.00025 xBTC</span>
+            </div>
+            <div class="flex-between" style="margin-bottom: 0.5rem;">
+              <span style="color: var(--text-muted); font-size: 0.875rem;">Slippage</span>
+              <span class="badge badge-success">0.3%</span>
+            </div>
+            <div class="flex-between">
+              <span style="color: var(--text-muted); font-size: 0.875rem;">Fee</span>
+              <span>0.003 STX</span>
+            </div>
+          </div>
+
+          <button class="btn btn-success" style="width: 100%;" id="executeSwapBtn">Swap Tokens</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Vault Section -->
+  <section id="vault" style="padding: 4rem 0;">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 3rem;">
+        <h2>🔒 ClarityVault</h2>
+        <p style="font-size: 1.125rem;">Secure multi-signature vaults with staking rewards</p>
+      </div>
+
+      <div class="grid grid-2">
+        <!-- Create Vault -->
+        <div class="card">
+          <h3 style="margin-bottom: 1.5rem;">Create New Vault</h3>
+
+          <div style="margin-bottom: 1rem;">
+            <label
+              style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.875rem;">Vault
+              Name</label>
+            <input type="text" class="input" placeholder="My Secure Vault" id="vaultName">
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <label
+              style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.875rem;">Required
+              Signatures</label>
+            <select class="input" id="requiredSigs">
+              <option value="2">2 of 3</option>
+              <option value="3">3 of 5</option>
+              <option value="4">4 of 7</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <label
+              style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.875rem;">Time
+              Lock (days)</label>
+            <input type="number" class="input" placeholder="7" id="timeLock">
+          </div>
+
+          <button class="btn btn-primary" style="width: 100%;" id="createVaultBtn">Create Vault</button>
+        </div>
+
+        <!-- Stake in Vault -->
+        <div class="card">
+          <h3 style="margin-bottom: 1.5rem;">Stake in Vault</h3>
+
+          <div style="margin-bottom: 1rem;">
+            <label
+              style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.875rem;">Select
+              Vault</label>
+            <select class="input" id="vaultSelect">
+              <option>Community Treasury</option>
+              <option>Development Fund</option>
+              <option>Rewards Pool</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <label
+              style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.875rem;">Amount
+              (STX)</label>
+            <input type="number" class="input" placeholder="100" id="stakeAmount">
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <label
+              style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.875rem;">Lock
+              Duration (days)</label>
+            <input type="number" class="input" placeholder="30" id="lockDuration">
+          </div>
+
+          <div
+            style="padding: 1rem; background: var(--bg-glass); border-radius: var(--radius-md); margin-bottom: 1rem;">
+            <div class="flex-between" style="margin-bottom: 0.5rem;">
+              <span style="color: var(--text-muted); font-size: 0.875rem;">APY</span>
+              <span style="color: #4facfe; font-weight: 700;">12.5%</span>
+            </div>
+            <div class="flex-between">
+              <span style="color: var(--text-muted); font-size: 0.875rem;">Est. Rewards</span>
+              <span style="font-weight: 600;">10.27 STX</span>
+            </div>
+          </div>
+
+          <button class="btn btn-success" style="width: 100%;" id="stakeBtn">Stake Tokens</button>
+        </div>
+      </div>
+
+      <!-- My Vaults -->
+      <div style="margin-top: 3rem;">
+        <h3 style="margin-bottom: 1.5rem;">My Vaults</h3>
+        <div class="grid grid-3" id="myVaults">
+          <!-- Will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About/Tech Stack Section -->
+  <section id="about" style="padding: 4rem 0; background: var(--bg-secondary);">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 3rem;">
+        <h2>🚀 Technology Stack</h2>
+        <p style="font-size: 1.125rem;">Built with cutting-edge blockchain technology</p>
+      </div>
+
+      <div class="grid grid-3">
+        <div class="card">
+          <div style="font-size: 2rem; margin-bottom: 1rem;">⚡</div>
+          <h3>Clarity 2.0</h3>
+          <p>Advanced smart contracts with provably secure logic and sophisticated data structures</p>
+          <div style="margin-top: 1rem;">
+            <span class="badge badge-primary">Verified</span>
+            <span class="badge badge-success">Mainnet</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="font-size: 2rem; margin-bottom: 1rem;">🔗</div>
+          <h3>Stacks.js 6.0</h3>
+          <p>Seamless wallet integration with Stacks Connect and Leather Wallet support</p>
+          <div style="margin-top: 1rem;">
+            <span class="badge badge-primary">SIP-010</span>
+            <span class="badge badge-warning">Web3</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="font-size: 2rem; margin-bottom: 1rem;">📊</div>
+          <h3>Chainlink Integration</h3>
+          <p>Real-time price feeds and VRF for provably-fair reward distribution</p>
+          <div style="margin-top: 1rem;">
+            <span class="badge badge-success">Oracle</span>
+            <span class="badge badge-primary">VRF</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="padding: 2rem 0; border-top: 1px solid var(--border-color);">
+    <div class="container">
+      <div class="flex-between" style="flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <div class="logo" style="margin-bottom: 0.5rem;">⚡ StacksRank</div>
+          <p style="margin: 0; font-size: 0.875rem;">Built for Talent Protocol Stacks Event 2026</p>
+        </div>
+        <div style="display: flex; gap: 1.5rem;">
+          <a href="#" style="color: var(--text-secondary); text-decoration: none;">GitHub</a>
+          <a href="#" style="color: var(--text-secondary); text-decoration: none;">Twitter</a>
+          <a href="#" style="color: var(--text-secondary); text-decoration: none;">Discord</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="src/app-leather.js"></script>
+</body>
+
+</html>
