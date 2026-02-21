@@ -1,0 +1,40 @@
+---
+id: 0
+name: Mainnet deployment
+network: mainnet
+stacks-node: "https://api.hiro.so"
+bitcoin-node: "http://blockstack:blockstacksystem@bitcoin.blockstack.com:8332"
+plan:
+  batches:
+    - id: 0
+      transactions:
+        - contract-publish:
+            contract-name: stacksrank-reputation
+            expected-sender: ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5
+            cost: 10000
+            path: contracts/stacksrank-reputation.clar
+            anchor-block-only: true
+        - contract-publish:
+            contract-name: stx-swap-atomic
+            expected-sender: ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5
+            cost: 10000
+            path: contracts/stx-swap-atomic.clar
+            anchor-block-only: true
+        - contract-publish:
+            contract-name: clarity-vault-multi-sig
+            expected-sender: ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5
+            cost: 10000
+            path: contracts/clarity-vault-multi-sig.clar
+            anchor-block-only: true
+        - contract-publish:
+            contract-name: feb-builder-check-in
+            expected-sender: ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5
+            cost: 10000
+            path: contracts/feb-builder-check-in.clar
+            anchor-block-only: true
+        - contract-publish:
+            contract-name: defi-builder-tools
+            expected-sender: ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5
+            cost: 10000
+            path: contracts/defi-builder-tools.clar
+            anchor-block-only: true

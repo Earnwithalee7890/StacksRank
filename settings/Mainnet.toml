@@ -1,0 +1,8 @@
+[network]
+name = "mainnet"
+stacks_node = "https://std-01.mainnet.stacks.co"
+bitcoin_node = "http://blockstack:blockstacksystem@bitcoin.blockstack.com:8332"
+
+[accounts.deployer]
+mnemonic = "fetch outside black test wash cover just actual execute nice door want airport betray quantum stamp fish act pen trust portion fatigue scissors vague"
+balance = 100000000000000
