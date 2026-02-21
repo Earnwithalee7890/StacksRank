@@ -1,0 +1,40 @@
+{
+  "name": "stacksrank",
+  "version": "1.0.0",
+  "description": "StacksRank - Leaderboard, Swap & Vault Platform for Stacks Ecosystem",
+  "main": "index.js",
+  "scripts": {
+    "dev": "serve .",
+    "build": "echo 'Static site build complete'",
+    "start": "serve .",
+    "test": "jest",
+    "test:contracts": "clarinet check"
+  },
+  "keywords": [
+    "stacks",
+    "clarity",
+    "defi",
+    "swap",
+    "vault",
+    "leaderboard",
+    "blockchain",
+    "talent-protocol"
+  ],
+  "author": "Earnwithalee7890",
+  "license": "MIT",
+  "dependencies": {
+    "@stacks/connect": "^7.8.2",
+    "@stacks/network": "^6.13.0",
+    "@stacks/transactions": "^6.13.0",
+    "@stacks/wallet-sdk": "^6.13.0",
+    "serve": "^14.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "@types/react": "^18.2.48",
+    "autoprefixer": "^10.4.17",
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "postcss": "^8.4.33"
+  }
+}
