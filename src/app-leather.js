@@ -11,7 +11,8 @@ const CONTRACT_ADDRESSES = {
     SWAP: 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.simple-swap',
     VAULT: 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.simple-vault',
     FEB_CHECKIN: 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.feb-builder-check-in',
-    DEFI_TOOLS: 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.defi-builder-tools'
+    DEFI_TOOLS: 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.defi-builder-tools',
+    FEE_DISTRIBUTOR: 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.dircet-fee-distributor'
 };
 
 const appDetails = {
@@ -470,6 +471,36 @@ async function requestBuilderService() {
     }
 }
 
+async function payProtocolFee() {
+    if (!connectedAddress) {
+        showNotification('⚠️ Please connect your wallet first', 'warning');
+        connectWallet();
+        return;
+    }
+
+    const btn = document.getElementById('payFeeBtn');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Processing...'; }
+
+    try {
+        const response = await callContract({
+            contract: CONTRACT_ADDRESSES.FEE_DISTRIBUTOR,
+            functionName: 'pay-fee',
+            functionArgs: []
+        });
+
+        if (response?.result || response?.txid) {
+            showNotification('✅ Fee of 0.02 STX paid successfully!', 'success');
+        } else {
+            showNotification('⚠️ Payment may have been cancelled', 'warning');
+        }
+    } catch (error) {
+        console.error('❌ Payment error:', error);
+        showNotification('❌ ' + (error.message || 'Payment failed'), 'error');
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Pay 0.02 STX Fee'; }
+    }
+}
+
 // ============================================================
 // UI FUNCTIONS
 // ============================================================
@@ -624,6 +655,9 @@ function attachListeners() {
 
     const requestServiceBtn = document.getElementById('requestServiceBtn');
     if (requestServiceBtn) requestServiceBtn.onclick = requestBuilderService;
+
+    const payFeeBtn = document.getElementById('payFeeBtn');
+    if (payFeeBtn) payFeeBtn.onclick = payProtocolFee;
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -1,9 +1,43 @@
-
 [project]
 name = "stacksrank"
 authors = ["Earnwithalee7890"]
 description = "StacksRank - Leaderboard, Swap & Vault Platform"
 telemetry_enabled = false
+
+[contracts.simple-reputation]
+path = "contracts/simple-reputation.clar"
+clarity_version = 2
+epoch = 2.4
+
+[contracts.simple-swap]
+path = "contracts/simple-swap.clar"
+clarity_version = 2
+epoch = 2.4
+
+[contracts.simple-vault]
+path = "contracts/simple-vault.clar"
+clarity_version = 2
+epoch = 2.4
+
+[contracts.feb-builder-check-in]
+path = "contracts/feb-builder-check-in.clar"
+clarity_version = 2
+epoch = 2.4
+
+[contracts.defi-builder-tools]
+path = "contracts/defi-builder-tools.clar"
+clarity_version = 2
+epoch = 2.4
+
+[contracts.direct-fee-distributor]
+path = "contracts/direct-fee-distributor.clar"
+clarity_version = 2
+epoch = 2.4
+
+[contracts.piggy-bank]
+path = "contracts/piggy-bank.clar"
+clarity_version = 2
+epoch = 2.4
 
 [repl]
 costs_version = 2
@@ -12,31 +46,3 @@ parser_version = 2
 [repl.analysis]
 passes = ["check_checker"]
 check_checker = { trusted_sender = false, trusted_caller = false, callee_filter = false }
-
-[[repl.contracts]]
-path = "contracts/simple-reputation.clar"
-clarity_version = 2
-epoch = 2.4
-
-[[repl.contracts]]
-path = "contracts/simple-swap.clar"
-clarity_version = 2
-epoch = 2.4
-
-[[repl.contracts]]
-path = "contracts/simple-vault.clar"
-clarity_version = 2
-epoch = 2.4
-
-[[repl.contracts]]
-path = "contracts/feb-builder-check-in.clar"
-clarity_version = 2
-epoch = 2.4
-
-
-
-
-[[repl.contracts]]
-path = "contracts/defi-builder-tools.clar"
-clarity_version = 2
-epoch = 2.4
