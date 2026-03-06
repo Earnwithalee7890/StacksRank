@@ -224,3 +224,9 @@ Track your deployment:
 ---
 
 **Ready to deploy!** Follow this guide step-by-step for successful mainnet launch. 🚀
+
+## Deployment Checklist
+- [ ] Run test suite
+- [ ] Verify contract endpoints against Mainnet
+- [ ] Execute trial transaction
+
