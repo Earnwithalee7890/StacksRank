@@ -3,6 +3,7 @@
 
 (define-constant CONTRACT-OWNER tx-sender)
 (define-constant ERR-NOT-OWNER (err u100))
+(define-constant ERR-ZERO-AMOUNT (err u101))
 
 (define-data-var total-tips uint u0)
 
@@ -31,3 +32,4 @@
 (define-read-only (get-balance)
   (ok (stx-get-balance (as-contract tx-sender)))
 )
+
