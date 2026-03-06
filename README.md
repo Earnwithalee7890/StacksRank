@@ -181,3 +181,8 @@ All contracts are deployed and verified on **Stacks Mainnet** for the Talent Pro
 - ✅ **Mainnet**: Fully operational.
 
 Built with ❤️ for the **Stacks Builder Community**.
+
+## Features overview
+- **Aegis Unified Protocol**: High quality security and integration features.
+- **Clarity Smart Contracts**: Robust and verified.
+
