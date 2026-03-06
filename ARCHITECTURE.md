@@ -339,3 +339,8 @@ NEW USER
 - **Smart Contracts**: Clarity (Reputation, Swap, Vault)
 - **Blockchain**: Stacks Mainnet (Bitcoin L2)
 - **Integration**: Leather Wallet, Xverse
+
+### Performance Considerations
+- Use SWR or React Query for caching API endpoints.
+- Pre-fetch contract data on hover state.
+
