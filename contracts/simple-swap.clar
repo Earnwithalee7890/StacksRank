@@ -1,5 +1,5 @@
-;; Simple STX Swap Contract - Working Version
-;; Direct STX swaps with escrow
+;; Simple STX Swap Contract - Enhanced v2
+;; Direct STX swaps with escrow, get-quote, slippage protection
 
 ;; Error codes
 (define-constant ERR-NOT-AUTHORIZED (err u200))
@@ -8,6 +8,7 @@
 (define-constant ERR-SWAP-NOT-FOUND (err u203))
 (define-constant ERR-SWAP-EXPIRED (err u204))
 (define-constant ERR-SWAP-COMPLETED (err u205))
+(define-constant ERR-SLIPPAGE-EXCEEDED (err u206))
 
 ;; Data variables
 (define-data-var swap-counter uint u0)
@@ -43,6 +44,21 @@
 
 (define-read-only (calculate-fee (amount uint))
   (/ (* amount (var-get fee-percentage)) u10000)
+)
+
+;; Get a swap quote: returns expected output after fee
+(define-read-only (get-quote (amount uint))
+  (let (
+    (fee (calculate-fee amount))
+    (net-amount (- amount fee))
+  )
+    (ok {
+      amount-in: amount,
+      fee: fee,
+      amount-out: net-amount,
+      fee-percentage: (var-get fee-percentage)
+    })
+  )
 )
 
 ;; Public functions
@@ -128,6 +144,22 @@
     (map-set swaps swap-id (merge swap { cancelled: true }))
     
     (ok true)
+  )
+)
+
+;; Swap with slippage protection: caller specifies minimum acceptable amount
+(define-public (create-swap-with-slippage
+    (counterparty principal)
+    (amount uint)
+    (duration uint)
+    (min-counterparty-amount uint))
+  (let (
+    (quote (unwrap! (get-quote amount) ERR-INVALID-AMOUNT))
+    (net-out (get amount-out quote))
+  )
+    ;; Reject if expected output is below caller's minimum
+    (asserts! (>= net-out min-counterparty-amount) ERR-SLIPPAGE-EXCEEDED)
+    (create-swap counterparty amount duration)
   )
 )
 
