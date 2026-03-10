@@ -90,6 +90,7 @@ After deployment, update these:
 - **Reputation Contract**: `SP[YOUR_ADDRESS].stacksrank-reputation`
 - **Swap Contract**: `SP[YOUR_ADDRESS].stx-swap-atomic`
 - **Vault Contract**: `SP[YOUR_ADDRESS].clarity-vault-multi-sig`
+- **Distributor Contract**: `SP[YOUR_ADDRESS].stx-distributor`
 
 ## Testing Deployed Contracts
 
@@ -135,6 +136,20 @@ After deployment, update these:
 (contract-call? .clarity-vault-multi-sig deposit-to-vault
   u1              ;; vault-id
   u10000000)      ;; 10 STX
+```
+
+- Deposit STX (10 STX)
+- Claim 1 STX (once per 24h)
+- Set claim amount / cooldown (admin)
+
+### Test Distributor Contract
+
+```clarity
+;; Deposit 10 STX
+(contract-call? .stx-distributor deposit u10000000)
+
+;; User claims daily reward
+(contract-call? .stx-distributor claim)
 ```
 
 ## Frontend Deployment
