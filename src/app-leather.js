@@ -1,6 +1,6 @@
 // StacksRank - Leather Wallet Integration
-// Uses window.LeatherProvider (direct Leather API) for all wallet interactions.
-// This avoids all @stacks/connect global binding issues.
+// Uses @stacks/connect openContractCall for wallet popups (the standard proven approach).
+// Uses window.LeatherProvider ONLY for address fetching.
 
 // ============================================================
 // CONFIG
@@ -12,13 +12,17 @@ const CONTRACT_ADDRESSES = {
     VAULT: 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.simple-vault',
     FEB_CHECKIN: 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.feb-builder-check-in',
     DEFI_TOOLS: 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.defi-builder-tools',
-    FEE_DISTRIBUTOR: 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.dircet-fee-distributor'
+    FEE_DISTRIBUTOR: 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.direct-fee-distributor',
+    STX_DISTRIBUTOR: 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.stx-distributor'
 };
 
 const appDetails = {
     name: 'StacksRank',
-    icon: window.location.origin + '/logo.svg',
+    icon: window.location.origin + '/logo.png',
 };
+
+// StacksMainnet object from CDN
+let stacksNetwork = null;
 
 // ============================================================
 // STATE
@@ -66,11 +70,25 @@ function showNotification(message, type = 'info') {
 }
 
 // ============================================================
-// WALLET CONNECTION (Direct Leather Provider API)
+// NETWORK SETUP
+// ============================================================
+function getNetwork() {
+    if (stacksNetwork) return stacksNetwork;
+    // Use StacksNetwork from @stacks/network CDN
+    if (window.StacksNetwork && window.StacksNetwork.StacksMainnet) {
+        stacksNetwork = new window.StacksNetwork.StacksMainnet();
+    } else if (window.StacksMainnet) {
+        stacksNetwork = new window.StacksMainnet();
+    }
+    return stacksNetwork;
+}
+
+// ============================================================
+// WALLET CONNECTION
 // ============================================================
 
 async function connectWallet() {
-    console.log('🔗 Connecting wallet via LeatherProvider...');
+    console.log('🔗 Connecting wallet...');
 
     if (!window.LeatherProvider) {
         showNotification('📦 Please install Leather wallet extension!', 'warning');
@@ -89,27 +107,22 @@ async function connectWallet() {
             if (found) stxAddr = found.address;
         }
 
-        if (!stxAddr) {
-            // Fallback
-            const fallback = await window.LeatherProvider.request('stx_requestAccounts');
-            console.log('📬 stx_requestAccounts response:', fallback);
-            if (fallback?.result?.addresses?.[0]?.address) {
-                stxAddr = fallback.result.addresses[0].address;
-            }
+        if (!stxAddr && response?.result?.addresses?.[0]) {
+            stxAddr = response.result.addresses[0].address;
         }
 
         if (stxAddr) {
             connectedAddress = stxAddr;
             updateWalletUI(stxAddr);
-            showNotification('✅ Wallet connected!', 'success');
+            showNotification('✅ Wallet connected: ' + stxAddr.slice(0, 8) + '...', 'success');
             fetchAccountBalance(stxAddr);
         } else {
-            showNotification('❌ Could not get STX address from wallet', 'error');
+            showNotification('❌ Could not get STX address', 'error');
         }
 
     } catch (error) {
         console.error('❌ Wallet connection error:', error);
-        showNotification('❌ Failed to connect wallet: ' + (error.message || error), 'error');
+        showNotification('❌ Failed to connect: ' + (error.message || error), 'error');
     }
 }
 
@@ -134,62 +147,61 @@ function updateWalletUI(address) {
 }
 
 // ============================================================
-// CLARITY VALUE ENCODING (manual, no external lib needed)
+// CORE CONTRACT CALL — Uses openContractCall from @stacks/connect
+// This is the CORRECT standard approach that shows the wallet popup
 // ============================================================
 
-// Encodes a Clarity string-ascii value to hex bytes
-// Format: 0x0d (type tag) + 4-byte big-endian length + UTF-8 bytes
-function encodeStringAscii(str) {
-    const bytes = new TextEncoder().encode(str);
-    const len = bytes.length;
-    const buf = new Uint8Array(5 + len);
-    buf[0] = 0x0d; // string-ascii type tag
-    buf[1] = (len >> 24) & 0xff;
-    buf[2] = (len >> 16) & 0xff;
-    buf[3] = (len >> 8) & 0xff;
-    buf[4] = len & 0xff;
-    buf.set(bytes, 5);
-    return Array.from(buf).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-// Encodes a Clarity uint value to hex bytes
-// Format: 0x01 (type tag) + 16-byte big-endian uint128
-function encodeUint(val) {
-    let n = BigInt(val);
-    const buf = new Uint8Array(17);
-    buf[0] = 0x01; // uint type tag
-    for (let i = 16; i >= 1; i--) {
-        buf[i] = Number(n & 0xffn);
-        n >>= 8n;
-    }
-    return Array.from(buf).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-// ============================================================
-// CORE CONTRACT CALL (Direct Leather API)
-// ============================================================
-
-async function callContract({ contract, functionName, functionArgs = [] }) {
-    if (!window.LeatherProvider) {
-        throw new Error('Leather wallet not installed. Please install from leather.io');
-    }
+function callContract({ contract, functionName, functionArgs = [], onSuccess, onCancel }) {
     if (!connectedAddress) {
-        throw new Error('Wallet not connected. Please connect first.');
+        showNotification('⚠️ Please connect your wallet first!', 'warning');
+        connectWallet();
+        return;
     }
 
-    console.log(`🚀 Calling ${contract}.${functionName} with`, functionArgs.length, 'args');
+    // Split 'SP...address.contract-name' into parts
+    const lastDot = contract.lastIndexOf('.');
+    const contractAddress = contract.substring(0, lastDot);
+    const contractName = contract.substring(lastDot + 1);
 
-    const response = await window.LeatherProvider.request('stx_callContract', {
-        contract,
+    console.log(`🚀 Calling ${contractAddress}.${contractName}::${functionName}`);
+
+    // Find openContractCall — @stacks/connect UMD CDN exposes as window.StacksConnect
+    const openContractCall =
+        window.StacksConnect?.openContractCall ||
+        window.stacksConnect?.openContractCall ||
+        window.Connect?.openContractCall ||
+        window.connect?.openContractCall;
+
+    console.log('🔍 StacksConnect:', window.StacksConnect);
+    console.log('🔍 openContractCall found:', !!openContractCall);
+
+    if (!openContractCall) {
+        // Log all window globals that might contain it, to help debug
+        const candidates = Object.keys(window).filter(k =>
+            k.toLowerCase().includes('stack') || k.toLowerCase().includes('connect')
+        );
+        console.error('❌ openContractCall not found. Window candidates:', candidates);
+        showNotification('❌ Wallet library not ready. Hard-refresh (Ctrl+Shift+R) and try again.', 'error');
+        return;
+    }
+
+    openContractCall({
+        contractAddress,
+        contractName,
         functionName,
-        functionArgs,   // pass pre-encoded hex strings directly
+        functionArgs: functionArgs || [],
         network: NETWORK,
-        postConditionMode: 'allow',
-        appDetails
+        appDetails,
+        postConditionMode: 1,
+        onFinish: (data) => {
+            console.log('✅ Transaction submitted:', data);
+            if (onSuccess) onSuccess(data);
+        },
+        onCancel: () => {
+            console.log('⚠️ User cancelled');
+            if (onCancel) onCancel();
+        }
     });
-
-    console.log('✅ Contract call response:', response);
-    return response;
 }
 
 // ============================================================
@@ -204,27 +216,22 @@ async function dailyCheckIn() {
     }
 
     const btn = document.getElementById('checkInBtn');
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Processing...'; }
+    if (btn) btn.textContent = '⏳ Processing...';
 
-    try {
-        const response = await callContract({
-            contract: CONTRACT_ADDRESSES.FEB_CHECKIN,
-            functionName: 'check-in',
-            functionArgs: []
-        });
-
-        if (response?.result || response?.txid) {
+    callContract({
+        contract: CONTRACT_ADDRESSES.FEB_CHECKIN,
+        functionName: 'check-in',
+        functionArgs: [],
+        onSuccess: () => {
             showNotification('✅ Check-in submitted successfully!', 'success');
+            if (btn) { btn.disabled = false; btn.textContent = '✅ Daily Check-in'; }
             loadLeaderboard();
-        } else {
-            showNotification('⚠️ Check-in may have been cancelled', 'warning');
+        },
+        onCancel: () => {
+            showNotification('⚠️ Check-in cancelled', 'warning');
+            if (btn) { btn.disabled = false; btn.textContent = '✅ Daily Check-in'; }
         }
-    } catch (error) {
-        console.error('❌ Check-in error:', error);
-        showNotification('❌ ' + (error.message || 'Check-in failed'), 'error');
-    } finally {
-        if (btn) { btn.disabled = false; btn.textContent = '✅ Daily Check-in'; }
-    }
+    });
 }
 
 async function executeSwap() {
@@ -241,27 +248,21 @@ async function executeSwap() {
     }
 
     const btn = document.getElementById('executeSwapBtn');
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Swapping...'; }
 
-    try {
-        const response = await callContract({
-            contract: CONTRACT_ADDRESSES.SWAP,
-            functionName: 'create-swap',
-            functionArgs: []
-        });
-
-        if (response?.result || response?.txid) {
+    callContract({
+        contract: CONTRACT_ADDRESSES.SWAP,
+        functionName: 'create-swap',
+        functionArgs: [],
+        onSuccess: () => {
             showNotification('✅ Swap submitted!', 'success');
+            if (btn) { btn.disabled = false; btn.textContent = 'Swap Tokens'; }
             updateStats();
-        } else {
-            showNotification('⚠️ Swap may have been cancelled', 'warning');
+        },
+        onCancel: () => {
+            showNotification('⚠️ Swap cancelled', 'warning');
+            if (btn) { btn.disabled = false; btn.textContent = 'Swap Tokens'; }
         }
-    } catch (error) {
-        console.error('❌ Swap error:', error);
-        showNotification('❌ ' + (error.message || 'Swap failed'), 'error');
-    } finally {
-        if (btn) { btn.disabled = false; btn.textContent = 'Swap Tokens'; }
-    }
+    });
 }
 
 async function createVault() {
@@ -278,27 +279,21 @@ async function createVault() {
     }
 
     const btn = document.getElementById('createVaultBtn');
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Creating...'; }
 
-    try {
-        const response = await callContract({
-            contract: CONTRACT_ADDRESSES.VAULT,
-            functionName: 'create-vault',
-            functionArgs: []
-        });
-
-        if (response?.result || response?.txid) {
+    callContract({
+        contract: CONTRACT_ADDRESSES.VAULT,
+        functionName: 'create-vault',
+        functionArgs: [],
+        onSuccess: () => {
             showNotification(`✅ Vault "${vaultName}" created!`, 'success');
+            if (btn) { btn.disabled = false; btn.textContent = 'Create Vault'; }
             setTimeout(loadUserVaults, 500);
-        } else {
-            showNotification('⚠️ Vault creation may have been cancelled', 'warning');
+        },
+        onCancel: () => {
+            showNotification('⚠️ Vault creation cancelled', 'warning');
+            if (btn) { btn.disabled = false; btn.textContent = 'Create Vault'; }
         }
-    } catch (error) {
-        console.error('❌ Vault error:', error);
-        showNotification('❌ ' + (error.message || 'Vault creation failed'), 'error');
-    } finally {
-        if (btn) { btn.disabled = false; btn.textContent = 'Create Vault'; }
-    }
+    });
 }
 
 async function stakeInVault() {
@@ -315,32 +310,47 @@ async function stakeInVault() {
     }
 
     const btn = document.getElementById('stakeBtn');
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Staking...'; }
 
-    try {
-        const response = await callContract({
-            contract: CONTRACT_ADDRESSES.VAULT,
-            functionName: 'deposit',
-            functionArgs: []
-        });
-
-        if (response?.result || response?.txid) {
+    callContract({
+        contract: CONTRACT_ADDRESSES.VAULT,
+        functionName: 'deposit',
+        functionArgs: [],
+        onSuccess: () => {
             showNotification(`✅ Staked ${amount} STX!`, 'success');
+            if (btn) { btn.disabled = false; btn.textContent = 'Stake Tokens'; }
             updateStats();
-        } else {
-            showNotification('⚠️ Staking may have been cancelled', 'warning');
+        },
+        onCancel: () => {
+            showNotification('⚠️ Stake cancelled', 'warning');
+            if (btn) { btn.disabled = false; btn.textContent = 'Stake Tokens'; }
         }
-    } catch (error) {
-        console.error('❌ Staking error:', error);
-        showNotification('❌ ' + (error.message || 'Staking failed'), 'error');
-    } finally {
-        if (btn) { btn.disabled = false; btn.textContent = 'Stake Tokens'; }
-    }
+    });
 }
 
 // ============================================================
-// BUILDER TOOLS (defi-builder-tools contract)
+// BUILDER TOOLS
 // ============================================================
+
+function encodeStringAscii(str) {
+    // Use Cl from @stacks/transactions CDN if available, else fallback to hex
+    if (window.StacksTransactions && window.StacksTransactions.Cl) {
+        return window.StacksTransactions.Cl.stringAscii(str);
+    }
+    if (window.Cl) {
+        return window.Cl.stringAscii(str);
+    }
+    // Manual hex fallback
+    const bytes = new TextEncoder().encode(str);
+    const len = bytes.length;
+    const buf = new Uint8Array(5 + len);
+    buf[0] = 0x0d;
+    buf[1] = (len >> 24) & 0xff;
+    buf[2] = (len >> 16) & 0xff;
+    buf[3] = (len >> 8) & 0xff;
+    buf[4] = len & 0xff;
+    buf.set(bytes, 5);
+    return Array.from(buf).map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 async function registerBuilder() {
     if (!connectedAddress) {
@@ -358,34 +368,23 @@ async function registerBuilder() {
     }
 
     const btn = document.getElementById('registerBuilderBtn');
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Registering...'; }
+    if (btn) btn.textContent = '⏳ Opening wallet...';
 
-    try {
-        // Use manual Clarity encoding - always works, no external lib needed
-        const args = [
-            encodeStringAscii(name),
-            encodeStringAscii(profileUrl)
-        ];
-
-        const response = await callContract({
-            contract: CONTRACT_ADDRESSES.DEFI_TOOLS,
-            functionName: 'register-builder',
-            functionArgs: args
-        });
-
-        if (response?.result || response?.txid) {
-            showNotification(`✅ Welcome, Builder ${name}! (0.02 STX fee paid)`, 'success');
+    callContract({
+        contract: CONTRACT_ADDRESSES.DEFI_TOOLS,
+        functionName: 'register-builder',
+        functionArgs: [encodeStringAscii(name), encodeStringAscii(profileUrl)],
+        onSuccess: () => {
+            showNotification(`✅ Registered as Builder: ${name}!`, 'success');
+            if (btn) { btn.disabled = false; btn.textContent = 'Register Builder'; }
             document.getElementById('builderName').value = '';
             document.getElementById('builderProfile').value = '';
-        } else {
-            showNotification('⚠️ Registration may have been cancelled', 'warning');
+        },
+        onCancel: () => {
+            showNotification('⚠️ Registration cancelled', 'warning');
+            if (btn) { btn.disabled = false; btn.textContent = 'Register Builder'; }
         }
-    } catch (error) {
-        console.error('❌ Registration error:', error);
-        showNotification('❌ ' + (error.message || 'Registration failed'), 'error');
-    } finally {
-        if (btn) { btn.disabled = false; btn.textContent = 'Register Builder'; }
-    }
+    });
 }
 
 async function updateBuilderStatus() {
@@ -402,29 +401,22 @@ async function updateBuilderStatus() {
     }
 
     const btn = document.getElementById('updateStatusBtn');
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Updating...'; }
+    if (btn) btn.textContent = '⏳ Opening wallet...';
 
-    try {
-        const args = [encodeStringAscii(status)];
-
-        const response = await callContract({
-            contract: CONTRACT_ADDRESSES.DEFI_TOOLS,
-            functionName: 'update-status',
-            functionArgs: args
-        });
-
-        if (response?.result || response?.txid) {
-            showNotification('✅ Status updated! (0.01 STX fee paid)', 'success');
+    callContract({
+        contract: CONTRACT_ADDRESSES.DEFI_TOOLS,
+        functionName: 'update-status',
+        functionArgs: [encodeStringAscii(status)],
+        onSuccess: () => {
+            showNotification('✅ Status updated!', 'success');
+            if (btn) { btn.disabled = false; btn.textContent = 'Update Status'; }
             document.getElementById('builderStatus').value = '';
-        } else {
-            showNotification('⚠️ Update may have been cancelled', 'warning');
+        },
+        onCancel: () => {
+            showNotification('⚠️ Status update cancelled', 'warning');
+            if (btn) { btn.disabled = false; btn.textContent = 'Update Status'; }
         }
-    } catch (error) {
-        console.error('❌ Update error:', error);
-        showNotification('❌ ' + (error.message || 'Update failed'), 'error');
-    } finally {
-        if (btn) { btn.disabled = false; btn.textContent = 'Update Status'; }
-    }
+    });
 }
 
 async function requestBuilderService() {
@@ -443,32 +435,22 @@ async function requestBuilderService() {
     }
 
     const btn = document.getElementById('requestServiceBtn');
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Requesting...'; }
+    if (btn) btn.textContent = '⏳ Opening wallet...';
 
-    try {
-        const args = [
-            encodeStringAscii(serviceType),
-            encodeStringAscii(details)
-        ];
-
-        const response = await callContract({
-            contract: CONTRACT_ADDRESSES.DEFI_TOOLS,
-            functionName: 'request-service',
-            functionArgs: args
-        });
-
-        if (response?.result || response?.txid) {
-            showNotification('✅ Service requested! (0.01 STX fee paid)', 'success');
+    callContract({
+        contract: CONTRACT_ADDRESSES.DEFI_TOOLS,
+        functionName: 'request-service',
+        functionArgs: [encodeStringAscii(serviceType), encodeStringAscii(details)],
+        onSuccess: () => {
+            showNotification('✅ Service requested!', 'success');
+            if (btn) { btn.disabled = false; btn.textContent = 'Request Service'; }
             document.getElementById('serviceDetails').value = '';
-        } else {
-            showNotification('⚠️ Request may have been cancelled', 'warning');
+        },
+        onCancel: () => {
+            showNotification('⚠️ Service request cancelled', 'warning');
+            if (btn) { btn.disabled = false; btn.textContent = 'Request Service'; }
         }
-    } catch (error) {
-        console.error('❌ Request error:', error);
-        showNotification('❌ ' + (error.message || 'Request failed'), 'error');
-    } finally {
-        if (btn) { btn.disabled = false; btn.textContent = 'Request Service'; }
-    }
+    });
 }
 
 async function payProtocolFee() {
@@ -479,26 +461,47 @@ async function payProtocolFee() {
     }
 
     const btn = document.getElementById('payFeeBtn');
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Processing...'; }
+    if (btn) btn.textContent = '⏳ Opening wallet...';
 
-    try {
-        const response = await callContract({
-            contract: CONTRACT_ADDRESSES.FEE_DISTRIBUTOR,
-            functionName: 'pay-fee',
-            functionArgs: []
-        });
-
-        if (response?.result || response?.txid) {
-            showNotification('✅ Fee of 0.02 STX paid successfully!', 'success');
-        } else {
-            showNotification('⚠️ Payment may have been cancelled', 'warning');
+    callContract({
+        contract: CONTRACT_ADDRESSES.FEE_DISTRIBUTOR,
+        functionName: 'pay-fee',
+        functionArgs: [],
+        onSuccess: () => {
+            showNotification('✅ Fee of 0.02 STX paid!', 'success');
+            if (btn) { btn.disabled = false; btn.textContent = 'Pay 0.02 STX Fee'; }
+        },
+        onCancel: () => {
+            showNotification('⚠️ Payment cancelled', 'warning');
+            if (btn) { btn.disabled = false; btn.textContent = 'Pay 0.02 STX Fee'; }
         }
-    } catch (error) {
-        console.error('❌ Payment error:', error);
-        showNotification('❌ ' + (error.message || 'Payment failed'), 'error');
-    } finally {
-        if (btn) { btn.disabled = false; btn.textContent = 'Pay 0.02 STX Fee'; }
+    });
+}
+
+// Claim 1 STX from the daily distributor
+async function claimDistribution() {
+    if (!connectedAddress) {
+        showNotification('⚠️ Please connect your wallet first', 'warning');
+        connectWallet();
+        return;
     }
+
+    const btn = document.getElementById('claimDistributionBtn');
+    if (btn) btn.textContent = '⏳ Opening wallet...';
+
+    callContract({
+        contract: CONTRACT_ADDRESSES.STX_DISTRIBUTOR,
+        functionName: 'claim',
+        functionArgs: [],
+        onSuccess: () => {
+            showNotification('✅ 1 STX claimed successfully! Check your wallet.', 'success');
+            if (btn) { btn.disabled = false; btn.textContent = '🎁 Claim 1 STX'; }
+        },
+        onCancel: () => {
+            showNotification('⚠️ Claim cancelled. Try again after 24 hours.', 'warning');
+            if (btn) { btn.disabled = false; btn.textContent = '🎁 Claim 1 STX'; }
+        }
+    });
 }
 
 // ============================================================
@@ -507,7 +510,7 @@ async function payProtocolFee() {
 
 async function fetchAccountBalance(address) {
     try {
-        const baseUrl = NETWORK === 'mainnet' ? 'https://api.hiro.so' : 'https://api.testnet.hiro.so';
+        const baseUrl = 'https://api.hiro.so';
         const response = await fetch(`${baseUrl}/extended/v1/address/${address}/balances`);
         if (!response.ok) return;
         const data = await response.json();
@@ -646,7 +649,6 @@ function attachListeners() {
     const stakeBtn = document.getElementById('stakeBtn');
     if (stakeBtn) stakeBtn.onclick = stakeInVault;
 
-    // Builder Tools
     const registerBuilderBtn = document.getElementById('registerBuilderBtn');
     if (registerBuilderBtn) registerBuilderBtn.onclick = registerBuilder;
 
@@ -658,12 +660,16 @@ function attachListeners() {
 
     const payFeeBtn = document.getElementById('payFeeBtn');
     if (payFeeBtn) payFeeBtn.onclick = payProtocolFee;
+
+    const claimDistributionBtn = document.getElementById('claimDistributionBtn');
+    if (claimDistributionBtn) claimDistributionBtn.onclick = claimDistribution;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 StacksRank initializing...');
     console.log('🔍 LeatherProvider available:', !!window.LeatherProvider);
-    console.log('🔍 StacksTransactions available:', !!window.StacksTransactions);
+    console.log('🔍 StacksConnect available:', !!window.StacksConnect);
+    console.log('🔍 Connect available:', !!window.Connect);
 
     attachListeners();
     loadLeaderboard();
