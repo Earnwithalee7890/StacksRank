@@ -70,6 +70,7 @@
     (asserts! (>= balance amount) ERR-INSUFFICIENT-FUNDS)
 
     ;; Update last claim block BEFORE the transfer (re-entrancy guard)
+    ;; This strictly enforces the cooldown-blocks wait-time per user.
     (map-set last-claim-height claimer block-height)
 
     ;; Transfer from contract to the claimer
