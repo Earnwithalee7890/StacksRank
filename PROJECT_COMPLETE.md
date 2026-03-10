@@ -111,6 +111,19 @@ Congratulations! I've created a **complete, production-ready StacksRank platform
 - `stake-in-vault()` - Stake for rewards
 - `claim-staking-rewards()` - Claim earned rewards
 
+#### 4. **stx-distributor.clar** (4.8 KB)
+- ✅ Daily check-in rewards (1 STX per 24h)
+- ✅ Automated reward distribution logic
+- ✅ Admin controls for claim-amount and cooldown
+- ✅ Gas-optimized as-contract math
+- ✅ Re-entrancy protection
+
+**Key Functions:**
+- `deposit(amount)` - Owner funds the distributor
+- `claim()` - Users claim their daily 1 STX
+- `set-claim-amount()` - Admin update reward size
+- `get-balance()` - Read contract treasury balance
+
 ---
 
 ### 🎨 Frontend (Premium UI/UX)
