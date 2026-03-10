@@ -171,6 +171,7 @@ All contracts are deployed and verified on **Stacks Mainnet** for the Talent Pro
 | **DeFi Swap** | [`SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.simple-swap`](https://explorer.hiro.so/txid/SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.simple-swap?chain=mainnet) |
 | **Multi-Sig Vault** | [`SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.simple-vault`](https://explorer.hiro.so/txid/SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.simple-vault?chain=mainnet) |
 | **Builder Tools** | [`SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.defi-builder-tools`](https://explorer.hiro.so/txid/SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.defi-builder-tools?chain=mainnet) |
+| **STX Distributor** | [`SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.stx-distributor`](https://explorer.hiro.so/txid/SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.stx-distributor?chain=mainnet) |
 
 ---
 
