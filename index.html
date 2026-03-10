@@ -19,23 +19,10 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap"
     rel="stylesheet">
 
-  <!-- Leather Wallet Integration -->
-  <script type="module">
-    // Detect Leather wallet
-    window.addEventListener('load', () => {
-      if (window.LeatherProvider) {
-        console.log('✅ Leather wallet detected');
-      } else {
-        console.log('⚠️ Leather wallet not installed');
-      }
-    });
-  </script>
+  <!-- Leather Wallet Integration is handled by src/app-leather.js -->
 
-  <!-- Stacks.js for contract interactions -->
-  <!-- Stacks.js for contract interactions -->
-  <!-- Stacks.js for contract interactions -->
-  <script src="https://cdn.jsdelivr.net/npm/@stacks/auth@5.1.4/dist/auth.umd.production.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@stacks/connect@7.2.0/dist/connect.umd.production.min.js"></script>
+  <!-- Stacks.js — required for openContractCall wallet popup -->
+  <script src="https://cdn.jsdelivr.net/npm/@stacks/connect@7.10.1/dist/connect.umd.production.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@stacks/transactions@6.0.2/dist/index.umd.production.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@stacks/network@6.0.2/dist/index.umd.production.min.js"></script>
 
@@ -392,6 +379,36 @@
         <h3 style="margin-bottom: 1.5rem;">My Vaults</h3>
         <div class="grid grid-3" id="myVaults">
           <!-- Will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STX Daily Distributor Section -->
+  <section id="distributor" style="padding: 4rem 0; background: var(--bg-secondary);">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 3rem;">
+        <h2>🎁 Daily STX Distributor</h2>
+        <p style="font-size: 1.125rem;">Claim 1 STX every 24 hours. Rewards are sent directly to your wallet.</p>
+      </div>
+      <div style="max-width: 480px; margin: 0 auto;">
+        <div class="card card-glass" style="text-align: center;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🪙</div>
+          <h3 style="margin-bottom: 0.5rem;">Daily Reward: 1 STX</h3>
+          <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 2rem;">
+            Connect your wallet and claim once every 24 hours (~144 blocks).
+          </p>
+          <div
+            style="padding: 1rem; background: var(--bg-glass); border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Contract</div>
+            <div style="font-size: 0.7rem; font-family: monospace; color: #4facfe; word-break: break-all;">
+              SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.stx-distributor
+            </div>
+          </div>
+          <button class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1rem;"
+            id="claimDistributionBtn">
+            🎁 Claim 1 STX
+          </button>
         </div>
       </div>
     </div>
