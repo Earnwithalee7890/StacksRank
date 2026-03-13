@@ -133,13 +133,25 @@
   )
 )
 
+;; Calculate quadratic points: points * sqrt(streak + 1)
+;; (Simplified for Clarity: using a multiplier based on user tier)
+(define-private (calculate-quadratic-score (base-points uint) (streak uint))
+  (let (
+    (multiplier (+ u100 (/ (* streak streak) u10))) ;; exponential bonus for streak
+  )
+    (/ (* base-points multiplier) u100)
+  )
+)
+
 (define-public (add-contribution (description (string-ascii 256)) (points uint))
   (let
     (
       (caller tx-sender)
       (user-data (unwrap! (map-get? users caller) ERR-NOT-REGISTERED))
       (contribution-id (get contributions user-data))
-      (new-score (+ (get score user-data) points))
+      (streak (get streak user-data))
+      (weighted-points (calculate-quadratic-score points streak))
+      (new-score (+ (get score user-data) weighted-points))
     )
     (asserts! (> points u0) ERR-INVALID-AMOUNT)
     (asserts! (<= points u100) ERR-INVALID-AMOUNT)
@@ -149,7 +161,7 @@
       { user: caller, contribution-id: contribution-id }
       {
         description: description,
-        points: points,
+        points: weighted-points,
         timestamp: stacks-block-height
       }
     )
@@ -160,10 +172,11 @@
       contributions: (+ contribution-id u1)
     }))
     
-    (print { event: "contribution", user: caller, points: points, total-score: new-score })
+    (print { event: "contribution", user: caller, points: weighted-points, total-score: new-score })
     (ok true)
   )
 )
+
 
 ;; Initialize contract
 (begin
