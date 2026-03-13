@@ -112,6 +112,22 @@
     (map-get? lp-positions { pool-id: pool-id, provider: provider }))
 )
 
+;; Quote for multi-hop swaps (Preview technical depth)
+(define-read-only (get-multi-hop-quote (amount-in uint) (pool-ids (list 5 uint)))
+  (fold calculate-next-hop pool-ids (ok amount-in))
+)
+
+(define-private (calculate-next-hop (pool-id uint) (current-amount-res (response uint uint)))
+  (match current-amount-res
+    amount-in
+    (match (map-get? pools pool-id)
+      pool (get-amount-out amount-in (get token-a-reserve pool) (get token-b-reserve pool))
+      (err ERR-POOL-NOT-FOUND)
+    )
+    err-val current-amount-res
+  )
+)
+
 ;; Get aggregate stats
 (define-read-only (get-stats)
   (ok {
@@ -119,9 +135,11 @@
     total-swaps: (var-get swap-counter),
     total-volume: (var-get total-volume),
     total-fees: (var-get total-fees-collected),
-    treasury: (var-get treasury-balance)
+    treasury: (var-get treasury-balance),
+    protocol-version: "2.1.0-alpha"
   })
 )
+
 
 ;; ───────────────────────────────────────────────────────────
 ;; PUBLIC: LIQUIDITY
