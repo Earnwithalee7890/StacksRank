@@ -142,3 +142,71 @@ Clarinet.test({
         tier.result.expectOk().expectAscii("Legend");
     },
 });
+
+Clarinet.test({
+    name: "simple-reputation: quadratic scoring rewards higher streaks",
+    async fn(chain: Chain, accounts: Map<string, Account>) {
+        const wallet_1 = accounts.get("wallet_1")!;
+
+        chain.mineBlock([
+            Tx.contractCall("simple-reputation", "register-user", [], wallet_1.address),
+            Tx.contractCall("simple-reputation", "daily-check-in", [], wallet_1.address), // Streak 1
+        ]);
+
+        // Contribution with streak 1
+        let block = chain.mineBlock([
+            Tx.contractCall(
+                "simple-reputation",
+                "add-contribution",
+                [types.ascii("Test contribution"), types.uint(100)],
+                wallet_1.address
+            ),
+        ]);
+        
+        // Multiplier at streak 1: 100 + (1*1)/10 = 100.1 -> 100% -> 100 points
+        let receipt = block.receipts[0];
+        let event = receipt.events.find((e: any) => e.type === "contract_event" && e.contract_event.topic === "print");
+        // @ts-ignore
+        assertEquals(event.contract_event.value.expectTuple()["points"].expectUint(100), true);
+
+        // Fast forward 150 blocks to check in again
+        chain.mineEmptyBlock(150);
+        
+        chain.mineBlock([
+            Tx.contractCall("simple-reputation", "daily-check-in", [], wallet_1.address), // Streak 2
+        ]);
+
+        // Contribution with streak 2
+        block = chain.mineBlock([
+            Tx.contractCall(
+                "simple-reputation",
+                "add-contribution",
+                [types.ascii("Another contribution"), types.uint(100)],
+                wallet_1.address
+            ),
+        ]);
+        
+        // Multiplier at streak 2: 100 + (2*2)/10 = 100.4 -> 100.4% -> 100 points (floor)
+        // Let's test streak 10
+        for(let i=0; i<8; i++) {
+            chain.mineEmptyBlock(150);
+            chain.mineBlock([Tx.contractCall("simple-reputation", "daily-check-in", [], wallet_1.address)]);
+        }
+
+        block = chain.mineBlock([
+            Tx.contractCall(
+                "simple-reputation",
+                "add-contribution",
+                [types.ascii("Big streak contribution"), types.uint(100)],
+                wallet_1.address
+            ),
+        ]);
+        
+        // Multiplier at streak 10: 100 + (10*10)/10 = 110% -> 110 points
+        receipt = block.receipts[0];
+        event = receipt.events.find((e: any) => e.type === "contract_event" && e.contract_event.topic === "print");
+        // @ts-ignore
+        assertEquals(event.contract_event.value.expectTuple()["points"].expectUint(110), true);
+    }
+});
+
