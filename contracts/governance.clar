@@ -33,9 +33,7 @@
 ;; DATA
 ;; ───────────────────────────────────────────────────────────
 
-;; Governance token balances (simplified — real version uses SIP-010)
-(define-map gov-token-balances principal uint)
-(define-data-var gov-token-supply uint u0)
+;; Governance tokens are now managed through the ve-token contract (Vote-Escrowed SRK)
 
 ;; Proposals
 (define-map proposals uint {
@@ -77,7 +75,7 @@
 )
 
 (define-read-only (get-voting-power (voter principal))
-  (default-to u0 (map-get? gov-token-balances voter))
+  (contract-call? .ve-token get-voting-power voter)
 )
 
 (define-read-only (get-param (key (string-ascii 50)))
@@ -105,24 +103,11 @@
   (ok {
     total-proposals: (var-get proposal-counter),
     executed: (var-get total-proposals-executed),
-    token-supply: (var-get gov-token-supply)
+    token-supply: (contract-call? .ve-token get-total-locked)
   })
 )
 
-;; ───────────────────────────────────────────────────────────
-;; PUBLIC: TOKEN (simplified)
-;; ───────────────────────────────────────────────────────────
-
-;; Mint governance tokens to a user (owner distributes)
-(define-public (mint-gov-tokens (recipient principal) (amount uint))
-  (begin
-    (asserts! (is-eq tx-sender CONTRACT-OWNER) ERR-NOT-AUTHORIZED)
-    (map-set gov-token-balances recipient
-      (+ (default-to u0 (map-get? gov-token-balances recipient)) amount))
-    (var-set gov-token-supply (+ (var-get gov-token-supply) amount))
-    (ok amount)
-  )
-)
+;; Governance tokens are now distributed and locked via srk-token and ve-token contracts.
 
 ;; ───────────────────────────────────────────────────────────
 ;; PUBLIC: PROPOSALS
@@ -244,7 +229,6 @@
 (begin
   (var-set proposal-counter u0)
   (var-set total-proposals-executed u0)
-  (var-set gov-token-supply u0)
   ;; Seed default protocol params
   (map-set protocol-params "swap-fee-bps" u30)
   (map-set protocol-params "flash-loan-fee-bps" u9)
