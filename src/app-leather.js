@@ -147,11 +147,11 @@ function updateWalletUI(address) {
 }
 
 // ============================================================
-// CORE CONTRACT CALL — Uses native Leather API
-// This entirely bypasses @stacks/connect to guarantee no missing library errors
+// CORE CONTRACT CALL — Uses standard openContractCall
+// This is the most reliable way to trigger the wallet popup.
 // ============================================================
 
-async function callContract({ contract, functionName, functionArgs = [], onSuccess, onCancel }) {
+function callContract({ contract, functionName, functionArgs = [], onSuccess, onCancel }) {
     if (!connectedAddress) {
         showNotification('⚠️ Please connect your wallet first!', 'warning');
         connectWallet();
@@ -165,42 +165,35 @@ async function callContract({ contract, functionName, functionArgs = [], onSucce
 
     console.log(`🚀 Calling ${contractAddress}.${contractName}::${functionName}`);
 
-    if (!window.LeatherProvider) {
-        showNotification('❌ Wallet not found. Please install Leather.', 'error');
+    // Standard detection for @stacks/connect UMD
+    const openContractCall = 
+        window.StacksConnect?.openContractCall || 
+        window.stacksConnect?.openContractCall ||
+        window.Connect?.openContractCall;
+
+    if (!openContractCall) {
+        console.error('❌ StacksConnect library not detected on page.');
+        showNotification('❌ Wallet library failed to load. Please Hard-Refresh (Ctrl+F5).', 'error');
         return;
     }
 
-    try {
-        const txRequest = {
-            network: NETWORK,
-            txType: 'contract_call',
-            contractAddress: contractAddress,
-            contractName: contractName,
-            functionName: functionName,
-            functionArgs: functionArgs,
-            postConditionMode: 1
-        };
-
-        // Use 'stx_contractCall' which is the correct native method for contract interactions
-        const response = await window.LeatherProvider.request('stx_contractCall', txRequest);
-        console.log('✅ Transaction submitted:', response);
-        
-        if (response?.result?.txId || response?.result?.txid) {
-            if (onSuccess) onSuccess(response);
-        } else {
-            throw new Error(response?.error?.message || 'Transaction was not broadcast');
+    openContractCall({
+        contractAddress,
+        contractName,
+        functionName,
+        functionArgs: functionArgs || [],
+        network: getNetwork(),
+        appDetails,
+        postConditionMode: 1, // PostConditionMode.Allow
+        onFinish: (data) => {
+            console.log('✅ Transaction broadcasted:', data);
+            if (onSuccess) onSuccess(data);
+        },
+        onCancel: () => {
+            console.log('⚠️ User cancelled');
+            if (onCancel) onCancel();
         }
-
-    } catch (error) {
-        console.warn('⚠️ Transaction error:', error);
-        const msg = error.message || (typeof error === 'string' ? error : 'User cancelled or unexpected error');
-        if (msg.toLowerCase().includes('cancel') || msg.toLowerCase().includes('reject')) {
-            showNotification('⚠️ Transaction cancelled', 'warning');
-        } else {
-            showNotification('❌ Transaction Error: ' + msg, 'error');
-        }
-        if (onCancel) onCancel();
-    }
+    });
 }
 
 // ============================================================
