@@ -181,12 +181,24 @@ async function callContract({ contract, functionName, functionArgs = [], onSucce
             postConditionMode: 1
         };
 
-        const response = await window.LeatherProvider.request('signTransaction', txRequest);
+        // Use 'stx_contractCall' which is the correct native method for contract interactions
+        const response = await window.LeatherProvider.request('stx_contractCall', txRequest);
         console.log('✅ Transaction submitted:', response);
-        if (onSuccess) onSuccess(response);
+        
+        if (response?.result?.txId || response?.result?.txid) {
+            if (onSuccess) onSuccess(response);
+        } else {
+            throw new Error(response?.error?.message || 'Transaction was not broadcast');
+        }
 
     } catch (error) {
-        console.warn('⚠️ User cancelled or error:', error);
+        console.warn('⚠️ Transaction error:', error);
+        const msg = error.message || (typeof error === 'string' ? error : 'User cancelled or unexpected error');
+        if (msg.toLowerCase().includes('cancel') || msg.toLowerCase().includes('reject')) {
+            showNotification('⚠️ Transaction cancelled', 'warning');
+        } else {
+            showNotification('❌ Transaction Error: ' + msg, 'error');
+        }
         if (onCancel) onCancel();
     }
 }
