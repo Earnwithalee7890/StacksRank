@@ -44,6 +44,21 @@ path = "contracts/stx-distributor.clar"
 clarity_version = 2
 epoch = 2.4
 
+[contracts.trait-sip-010]
+path = "contracts/traits/trait-sip-010.clar"
+clarity_version = 2
+epoch = 2.4
+
+[contracts.srk-token]
+path = "contracts/srk-token.clar"
+clarity_version = 2
+epoch = 2.4
+
+[contracts.ve-token]
+path = "contracts/ve-token.clar"
+clarity_version = 2
+epoch = 2.4
+
 [repl]
 costs_version = 2
 parser_version = 2
