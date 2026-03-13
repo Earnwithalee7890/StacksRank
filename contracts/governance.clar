@@ -1,5 +1,7 @@
 ;; Governance Contract - StacksRank DAO
 ;; Token-weighted voting for protocol parameter changes.
+(impl-trait .governance-trait.governance-trait)
+
 ;; Proposals expire after 1008 blocks (~7 days on Stacks).
 ;; Quorum: 10% of total supply. Majority: >50%.
 
@@ -15,12 +17,17 @@
 (define-constant ERR-PROPOSAL-ACTIVE   (err u505))
 (define-constant ERR-INVALID-VOTE      (err u506))
 (define-constant ERR-ALREADY-EXECUTED  (err u507))
+(define-constant ERR-INVALID-PROPOSAL  (err u508))
 
 ;; Voting period: ~7 days on Stacks (~1008 blocks)
 (define-constant VOTING-PERIOD u1008)
 
 ;; Quorum: minimum 100,000 uSTX worth of votes needed
 (define-constant QUORUM-THRESHOLD u100000)
+
+;; Minimum stake to propose: 5000 tokens
+(define-constant MIN-PROPOSAL-STAKE u5000)
+
 
 ;; ───────────────────────────────────────────────────────────
 ;; DATA
@@ -132,8 +139,12 @@
     (voting-power (get-voting-power tx-sender))
     (end-block (+ stacks-block-height VOTING-PERIOD))
   )
-    ;; Proposer must have at least 1000 gov tokens
-    (asserts! (>= voting-power u1000) ERR-NOT-AUTHORIZED)
+    ;; Proposer must have at least the minimum stake
+    (asserts! (>= voting-power MIN-PROPOSAL-STAKE) ERR-NOT-AUTHORIZED)
+    
+    ;; Basic validation for title and description length
+    (asserts! (> (len title) u5) ERR-INVALID-PROPOSAL)
+    (asserts! (> (len description) u10) ERR-INVALID-PROPOSAL)
 
     (map-set proposals proposal-id {
       proposer: tx-sender,
@@ -155,6 +166,7 @@
     (ok { proposal-id: proposal-id, end-block: end-block })
   )
 )
+
 
 ;; Cast a vote on a proposal (token-weighted)
 (define-public (cast-vote (proposal-id uint) (support bool))
