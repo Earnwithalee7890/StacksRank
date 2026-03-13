@@ -1,4 +1,4 @@
-// StacksRank - Leather Wallet Integration
+// StacksRank - Leather Wallet Integration (v1.0.1 - Fresh Build)
 // Uses @stacks/connect openContractCall for wallet popups (the standard proven approach).
 // Uses window.LeatherProvider ONLY for address fetching.
 
