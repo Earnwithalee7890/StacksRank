@@ -46,6 +46,42 @@ export async function connectStacksWallet() {
     });
 }
 
+import { 
+  AnchorMode, 
+  PostConditionMode, 
+  makeStandardSTXPostCondition, 
+  FungibleConditionCode 
+} from '@stacks/transactions';
+
+/**
+ * Perform a secure contract call with post-conditions
+ */
+export async function executeContractCall(contractAddress, contractName, functionName, functionArgs, postConditions = []) {
+  return new Promise((resolve, reject) => {
+    showConnect({
+      appDetails,
+      userSession,
+      onFinish: (data) => resolve(data),
+      onCancel: () => reject(new Error('User cancelled transaction')),
+      anchorMode: AnchorMode.Any,
+      postConditionMode: PostConditionMode.Deny, // Security: Deny by default
+      postConditions,
+      contractAddress,
+      contractName,
+      functionName,
+      functionArgs,
+      network
+    });
+  });
+}
+
+/**
+ * Helper to create a standard STX post-condition
+ */
+export function createSTXPostCondition(address, amount, conditionCode = FungibleConditionCode.Equal) {
+  return makeStandardSTXPostCondition(address, conditionCode, amount);
+}
+
 /**
  * Disconnect wallet
  */
@@ -53,6 +89,7 @@ export function disconnectWallet() {
     userSession.signUserOut();
     window.location.reload();
 }
+
 
 /**
  * Check if wallet is already connected
