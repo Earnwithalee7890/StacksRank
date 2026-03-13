@@ -147,11 +147,11 @@ function updateWalletUI(address) {
 }
 
 // ============================================================
-// CORE CONTRACT CALL — Uses openContractCall from @stacks/connect
-// This is the standard, proven approach that shows the wallet popup correctly.
+// CORE CONTRACT CALL — Uses native Leather API
+// This entirely bypasses @stacks/connect to guarantee no missing library errors
 // ============================================================
 
-function callContract({ contract, functionName, functionArgs = [], onSuccess, onCancel }) {
+async function callContract({ contract, functionName, functionArgs = [], onSuccess, onCancel }) {
     if (!connectedAddress) {
         showNotification('⚠️ Please connect your wallet first!', 'warning');
         connectWallet();
@@ -165,36 +165,30 @@ function callContract({ contract, functionName, functionArgs = [], onSuccess, on
 
     console.log(`🚀 Calling ${contractAddress}.${contractName}::${functionName}`);
 
-    // Find openContractCall — @stacks/connect UMD CDN exposes as window.StacksConnect
-    const openContractCall =
-        window.StacksConnect?.openContractCall ||
-        window.stacksConnect?.openContractCall ||
-        window.Connect?.openContractCall ||
-        window.connect?.openContractCall;
-
-    if (!openContractCall) {
-        console.error('❌ openContractCall not found. Ensure @stacks/connect is loaded.');
-        showNotification('❌ Wallet library not ready. Hard-refresh and try again.', 'error');
+    if (!window.LeatherProvider) {
+        showNotification('❌ Wallet not found. Please install Leather.', 'error');
         return;
     }
 
-    openContractCall({
-        contractAddress,
-        contractName,
-        functionName,
-        functionArgs: functionArgs || [],
-        network: getNetwork(), // IMPORTANT: Must be a StacksNetwork object, not a string
-        appDetails,
-        postConditionMode: 1,
-        onFinish: (data) => {
-            console.log('✅ Transaction submitted:', data);
-            if (onSuccess) onSuccess(data);
-        },
-        onCancel: () => {
-            console.log('⚠️ User cancelled');
-            if (onCancel) onCancel();
-        }
-    });
+    try {
+        const txRequest = {
+            network: NETWORK,
+            txType: 'contract_call',
+            contractAddress: contractAddress,
+            contractName: contractName,
+            functionName: functionName,
+            functionArgs: functionArgs,
+            postConditionMode: 1
+        };
+
+        const response = await window.LeatherProvider.request('signTransaction', txRequest);
+        console.log('✅ Transaction submitted:', response);
+        if (onSuccess) onSuccess(response);
+
+    } catch (error) {
+        console.warn('⚠️ User cancelled or error:', error);
+        if (onCancel) onCancel();
+    }
 }
 
 // ============================================================
