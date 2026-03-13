@@ -1,11 +1,30 @@
-;; Access Control Contract
-;; Role-based access control
+(impl-trait .guard-trait.guard-trait)
 
 (define-constant CONTRACT-OWNER tx-sender)
+(define-constant ERR-NOT-AUTHORIZED (err u401))
 (define-constant ERR-NOT-OWNER (err u100))
 
+(define-data-var paused bool false)
 (define-map roles principal (string-ascii 20))
 
+;; Guard Trait Implementation
+(define-read-only (is-paused)
+  (ok (var-get paused))
+)
+
+(define-public (set-paused (new-state bool))
+  (begin
+    (asserts! (is-eq tx-sender CONTRACT-OWNER) ERR-NOT-OWNER)
+    (var-set paused new-state)
+    (ok true)
+  )
+)
+
+(define-read-only (is-authorized (user principal))
+  (ok (or (is-eq user CONTRACT-OWNER) (is-some (map-get? roles user))))
+)
+
+;; Role Management
 (define-public (set-role (user principal) (role (string-ascii 20)))
   (begin
     (asserts! (is-eq tx-sender CONTRACT-OWNER) ERR-NOT-OWNER)
@@ -13,6 +32,7 @@
     (ok true)
   )
 )
+
 
 (define-public (remove-role (user principal))
   (begin
