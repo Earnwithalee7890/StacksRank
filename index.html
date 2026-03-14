@@ -21,25 +21,29 @@
 
   <!-- Leather Wallet Integration is handled by src/app-leather.js -->
   
-  <!-- Standard Stacks.js Libraries - Reliable Version 7 Global Bundles -->
-  <script src="https://cdn.jsdelivr.net/npm/@stacks/network@6.13.0/dist/index.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@stacks/transactions@6.13.0/dist/index.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@stacks/connect@7.8.2/dist/index.js"></script>
+  <!-- Standard Stacks.js Libraries - Reliable V8 Global Bundles via UNPKG -->
+  <script src="https://unpkg.com/@stacks/network@7.2.0/dist/index.js"></script>
+  <script src="https://unpkg.com/@stacks/transactions@7.3.0/dist/index.js"></script>
+  <script src="https://unpkg.com/@stacks/connect@8.2.3/dist/index.js"></script>
   
   <script>
-    // Universal Global Mapper for Stacks.js
-    window.addEventListener('load', () => {
-      window.stacks = window.stacks || {};
-      window.stacks.network = window.stacks.network || window.StacksNetwork;
-      window.stacks.transactions = window.stacks.transactions || window.StacksTransactions;
-      window.stacks.connect = window.stacks.connect || window.StacksConnect;
-      
-      console.log('📦 Stacks Library Mapping:', {
-        Connect: !!(window.stacks?.connect || window.StacksConnect),
-        Tx: !!(window.stacks?.transactions || window.StacksTransactions),
-        Net: !!(window.stacks?.network || window.StacksNetwork)
-      });
-    });
+    // Robust Global Library Mapper
+    (function() {
+      function mapStacks() {
+        window.stacks = window.stacks || {};
+        window.stacks.network = window.stacks.network || window.StacksNetwork;
+        window.stacks.transactions = window.stacks.transactions || window.StacksTransactions;
+        window.stacks.connect = window.stacks.connect || window.StacksConnect || window.Connect;
+        
+        console.log('✅ Stacks Libraries Mapped:', {
+            Connect: !!(window.stacks.connect?.openContractCall || window.StacksConnect?.openContractCall),
+            Network: !!window.stacks.network,
+            Tx: !!window.stacks.transactions
+        });
+      }
+      window.addEventListener('load', mapStacks);
+      setTimeout(mapStacks, 1000); // Fail-safe mapping
+    })();
   </script>
 
   <link rel="stylesheet" href="src/styles/globals.css">

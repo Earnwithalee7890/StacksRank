@@ -172,25 +172,41 @@ function callContract({ contract, functionName, functionArgs = [], onSuccess, on
 
     console.log(`🚀 Calling ${contractAddress}.${contractName}::${functionName}`);
 
-    // ROBUST SPECIFIC DETECTION
-    const openContractCall = 
-        window.stacks?.connect?.openContractCall || 
-        window.StacksConnect?.openContractCall ||
-        window.Connect?.openContractCall ||
-        window.Stacks?.Connect?.openContractCall ||
-        window.stacksConnect?.openContractCall;
+    // SUPER ROBUST DETECTION LOOP
+    let openContractCall = null;
+    const candidates = [
+        window.stacks?.connect,
+        window.StacksConnect,
+        window.Connect,
+        window.StacksConnect?.StacksConnect,
+        window.stacksConnect,
+        window.Stacks?.Connect
+    ];
+
+    for (const c of candidates) {
+        if (c && typeof c.openContractCall === 'function') {
+            openContractCall = c.openContractCall.bind(c);
+            break;
+        }
+    }
 
     if (!openContractCall) {
-        console.error('❌ Wallet library NOT detected. Checked globals:', {
-            stacks: !!window.stacks,
-            stacks_connect: !!window.stacks?.connect,
+        console.error('❌ Wallet library NOT detected. Diagnostics:', {
             StacksConnect: !!window.StacksConnect,
             Connect: !!window.Connect,
-            Stacks: !!window.Stacks
+            stacks: !!window.stacks,
+            stacks_connect: !!window.stacks?.connect
         });
-        showNotification('❌ Wallet library missing. Please wait 2s and try again.', 'error');
-        if (onCancel) onCancel();
-        return;
+        showNotification('❌ Wallet library failed to link. Using fallback...', 'warning');
+        
+        // Final attempt fallback: use window.Connect if available in any form
+        openContractCall = window.Connect?.openContractCall || window.StacksConnect?.openContractCall;
+        
+        if (!openContractCall) {
+            showNotification('❌ Critical Error: Wallet library missing. Please reload.', 'error');
+            if (onCancel) onCancel();
+            return;
+        }
     }
 
     // Get V8 constants from global objects
