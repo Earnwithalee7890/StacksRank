@@ -1,0 +1,47 @@
+{
+  "name": "stacksrank-sdk",
+  "version": "1.0.0",
+  "description": "SDK for interacting with StacksRank smart contracts on Stacks blockchain. Includes Clarity value encoding, contract addresses, wallet helpers, and Hiro API utilities.",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "types/index.d.ts",
+  "files": [
+    "index.js",
+    "esm/",
+    "types/",
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "stacks",
+    "clarity",
+    "blockchain",
+    "defi",
+    "leaderboard",
+    "stx",
+    "smart-contracts",
+    "web3",
+    "leather-wallet",
+    "hiro",
+    "talent-protocol",
+    "builder-rewards",
+    "stacksrank"
+  ],
+  "author": "Earnwithalee7890",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Earnwithalee7890/StacksRank.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Earnwithalee7890/StacksRank/issues"
+  },
+  "homepage": "https://github.com/Earnwithalee7890/StacksRank#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
