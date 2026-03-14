@@ -13,11 +13,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install Clarinet
-        run: |
-          wget https://github.com/hirosystems/clarinet/releases/download/v2.10.0/clarinet-linux-x64-glibc.tar.gz
-          tar -xvzf clarinet-linux-x64-glibc.tar.gz
-          sudo mv clarinet /usr/local/bin/
+      - name: Setup Clarinet
+        uses: hirosystems/setup-clarinet@v1
+        with:
+          clarinet-version: '2.10.0'
 
       - name: Clarinet Check
         run: clarinet check

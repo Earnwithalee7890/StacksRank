@@ -22,10 +22,10 @@
 - **Contribution Quality**: 10 high-quality commits showing iterative development and professional documentation.
 
 ## 🚀 Mainnet Deployment Status
-- **Reputation**: [Address TBD]
-- **AMM**: [Address TBD]
-- **Governance**: [Address TBD]
-- **Access Control**: [Address TBD]
+- **Reputation**: `SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.simple-reputation`
+- **AMM**: `SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.simple-swap`
+- **Vault**: `SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.simple-vault`
+- **Access Control**: `SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.defi-builder-tools`
 
 ---
-*Submitted for the February 2026 Stacks Builder Rewards Program.*
+*Submitted for the March 2026 Stacks Builder Rewards Program.*
