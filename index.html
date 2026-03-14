@@ -21,35 +21,28 @@
 
   <!-- Leather Wallet Integration is handled by src/app-leather.js -->
   
-  <!-- Standard Stacks.js Libraries - Reliable IIFE Global Bundles -->
-  <script src="https://cdn.jsdelivr.net/npm/@stacks/network@6.13.0/dist/index.global.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@stacks/transactions@6.13.0/dist/index.global.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@stacks/connect@7.8.2/dist/index.global.js"></script>
-  
-  <script>
-    (function() {
-      function syncStacks() {
-        // Ensure the StacksConnect, StacksTransactions, and StacksNetwork are correctly mapped
-        window.StacksConnect = window.StacksConnect || window.Connect;
-        window.StacksTransactions = window.StacksTransactions || window.StacksTx;
-        window.StacksNetwork = window.StacksNetwork || window.StacksNet;
+  <!-- Standard Stacks.js Libraries - Reliable ESM-to-Global Bridge -->
+  <script type="module">
+    import { openContractCall } from 'https://cdn.jsdelivr.net/npm/@stacks/connect@8.2.3/+esm';
+    import { StacksMainnet } from 'https://cdn.jsdelivr.net/npm/@stacks/network@7.2.0/+esm';
+    import { AnchorMode, PostConditionMode, stringAsciiCV } from 'https://cdn.jsdelivr.net/npm/@stacks/transactions@7.3.0/+esm';
 
-        // Create the modern 'stacks' namespace for consistency with app-leather.js
-        window.stacks = window.stacks || {};
-        window.stacks.connect = window.stacks.connect || window.StacksConnect;
-        window.stacks.transactions = window.stacks.transactions || window.StacksTransactions;
-        window.stacks.network = window.stacks.network || window.StacksNetwork;
-        
-        console.log('Final Library Mapping Check:', {
-          connect: !!window.stacks.connect?.openContractCall,
-          tx: !!window.stacks.transactions,
-          net: !!window.stacks.network
-        });
-      }
-      window.addEventListener('DOMContentLoaded', syncStacks);
-      window.addEventListener('load', syncStacks);
-      setInterval(syncStacks, 2000); // Periodic sync to catch delayed loads
-    })();
+    // Bridge ESM functions to the global window object for app-leather.js
+    window.StacksConnect = { openContractCall };
+    window.StacksNetwork = { StacksMainnet };
+    window.StacksTransactions = { AnchorMode, PostConditionMode, stringAsciiCV };
+    
+    // Unified 'stacks' namespace
+    window.stacks = {
+      connect: { openContractCall },
+      network: { StacksMainnet },
+      transactions: { AnchorMode, PostConditionMode, stringAsciiCV }
+    };
+    
+    console.log('🚀 Stacks.js Libraries (V8) Loaded via ESM Bridge');
+    
+    // Dispatch a custom event so the app knows we are ready
+    window.dispatchEvent(new CustomEvent('stacks-libraries-ready'));
   </script>
 
   <link rel="stylesheet" href="src/styles/globals.css">
@@ -506,7 +499,7 @@
     </div>
   </footer>
 
-  <script src="src/app-leather.js"></script>
+  <script src="src/app-leather.js" defer></script>
 </body>
 
 </html>

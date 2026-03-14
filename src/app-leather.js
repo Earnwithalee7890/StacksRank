@@ -172,19 +172,21 @@ function callContract({ contract, functionName, functionArgs = [], onSuccess, on
 
     console.log(`🚀 Calling ${contractAddress}.${contractName}::${functionName}`);
 
-    // DEFINITIVE DETECTION
+    // DEFINITIVE DETECTION (Via ESM Bridge)
     const openContractCall = 
         window.stacks?.connect?.openContractCall || 
-        window.StacksConnect?.openContractCall || 
-        window.Connect?.openContractCall;
+        window.StacksConnect?.openContractCall;
 
     if (!openContractCall) {
-        console.error('❌ Wallet library is STILL not found. Checked:', {
-            StacksConnect: !!window.StacksConnect,
-            Connect: !!window.Connect,
-            stacks: !!window.stacks
-        });
-        showNotification('❌ Internal Error: Wallet library failed to load. Please Hard-Refresh (Ctrl+F5).', 'error');
+        console.warn('⚠️ Stacks libraries not ready yet, waiting...');
+        showNotification('⏳ Initializing wallet connection...', 'info');
+        // If not found immediately, we can wait or tell the user to try again in 1s
+        setTimeout(() => {
+             if (window.stacks?.connect?.openContractCall) {
+                 showNotification('✅ Connection ready!', 'success');
+             }
+        }, 1000);
+        
         if (onCancel) onCancel();
         return;
     }
@@ -394,24 +396,16 @@ async function stakeInVault() {
 // ============================================================
 
 function encodeStringAscii(str) {
-    // Use Cl from @stacks/transactions CDN if available, else fallback to hex
-    if (window.StacksTransactions && window.StacksTransactions.Cl) {
-        return window.StacksTransactions.Cl.stringAscii(str);
+    const stringAsciiCV = 
+        window.stacks?.transactions?.stringAsciiCV || 
+        window.StacksTransactions?.stringAsciiCV;
+        
+    if (stringAsciiCV) {
+        return stringAsciiCV(str);
     }
-    if (window.Cl) {
-        return window.Cl.stringAscii(str);
-    }
-    // Manual hex fallback
-    const bytes = new TextEncoder().encode(str);
-    const len = bytes.length;
-    const buf = new Uint8Array(5 + len);
-    buf[0] = 0x0d;
-    buf[1] = (len >> 24) & 0xff;
-    buf[2] = (len >> 16) & 0xff;
-    buf[3] = (len >> 8) & 0xff;
-    buf[4] = len & 0xff;
-    buf.set(bytes, 5);
-    return Array.from(buf).map(b => b.toString(16).padStart(2, '0')).join('');
+    
+    console.error('❌ StacksTransactions.stringAsciiCV not found!');
+    return str; // Fallback to raw string (might fail on-chain)
 }
 
 async function registerBuilder() {
