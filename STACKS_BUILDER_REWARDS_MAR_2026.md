@@ -1,10 +1,10 @@
-# Stacks Builder Rewards: February 2026
+# Stacks Builder Rewards: March 2026
 
 ## Overview
 **Goal**: Earn rewards for building on Stacks.  
 **Rewards Pool**: 15,000 $STX  
-**Distribution Date**: March 3, 2026  
-**Activity Tracking**: Feb 1 - Feb 28, 2026  
+**Distribution Date**: April 3, 2026  
+**Activity Tracking**: March 1 - March 31, 2026  
 
 ## Eligibility
 To be eligible, you must:
