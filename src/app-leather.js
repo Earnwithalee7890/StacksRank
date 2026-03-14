@@ -1,5 +1,5 @@
-// StacksRank - Leather Wallet Integration (v1.2.1 - ESM Module Build)
-import { openContractCall, showConnect, authenticate, AppConfig, UserSession } from 'https://esm.sh/@stacks/connect@8.2.2';
+// StacksRank - Leather Wallet Integration (v1.2.2 - Robust ESM Build)
+import { openContractCall, showConnect, AppConfig, UserSession } from 'https://esm.sh/@stacks/connect@8.2.2';
 import { StacksMainnet } from 'https://esm.sh/@stacks/network@7.2.0';
 import { AnchorMode, PostConditionMode, stringAsciiCV } from 'https://esm.sh/@stacks/transactions@7.3.0';
 
@@ -27,15 +27,6 @@ const appConfig = new AppConfig(['store_write', 'publish_data']);
 const userSession = new UserSession({ appConfig });
 let connectedAddress = null;
 let stacksNetwork = new StacksMainnet();
-
-// ============================================================
-// LEADERBOARD DATA
-// ============================================================
-const mockLeaderboardData = [
-    { rank: 1, username: "Aleekhoso 🔵 🟣", score: 28300, streak: 12, contributions: 283, contracts: 200, rewards: "153 STX" },
-    { rank: 2, username: "StacksBuilder", score: 15420, streak: 45, contributions: 127, contracts: 85, rewards: "98 STX" },
-    { rank: 3, username: "ClarityDev", score: 12850, streak: 38, contributions: 93, contracts: 64, rewards: "82 STX" }
-];
 
 // ============================================================
 // HELPERS
@@ -69,37 +60,44 @@ function showNotification(message, type = 'info') {
 }
 
 // ============================================================
-// NETWORK SETUP
-// ============================================================
-function getNetwork() {
-    return stacksNetwork;
-}
-
-// ============================================================
 // WALLET CONNECTION
 // ============================================================
 
 async function connectWallet() {
-    console.log('🔗 Connecting wallet via Connect...');
+    console.log('🔗 Attempting to connect wallet...');
+    
+    // Check if Leather/Hiro is available directly to avoid auto-opening links
+    const isExtensionAvailable = !!(window.StacksProvider || window.LeatherProvider);
+    
+    if (!isExtensionAvailable) {
+        showNotification('📦 Leather wallet not detected. Please install it to continue.', 'warning');
+        console.warn('Wallet extension not found. Avoiding auto-open as per user preference.');
+        return;
+    }
     
     showConnect({
         appDetails,
+        userSession,
         onFinish: () => {
              const userData = userSession.loadUserData();
-             connectedAddress = userData.profile.stxAddress.mainnet || userData.profile.stxAddress.testnet;
+             connectedAddress = userData.profile.stxAddress.mainnet || userData.profile.stxAddress.testnet || userData.profile.stxAddress;
+             if (typeof connectedAddress === 'object') connectedAddress = connectedAddress.address || Object.values(connectedAddress)[0];
+             
+             console.log('✅ Connected as:', connectedAddress);
              updateWalletUI(connectedAddress);
-             showNotification('✅ Wallet connected: ' + connectedAddress.slice(0, 8) + '...', 'success');
+             showNotification('✅ Wallet connected!', 'success');
              fetchAccountBalance(connectedAddress);
+             loadUserVaults();
         },
         onCancel: () => {
              console.log('User cancelled login');
              showNotification('⚠️ Connection cancelled', 'warning');
-        },
-        userSession
+        }
     });
 }
 
 function disconnectWallet() {
+    userSession.signUserOut();
     connectedAddress = null;
     const btn = document.getElementById('connectWalletBtn');
     if (btn) {
@@ -112,8 +110,9 @@ function disconnectWallet() {
 
 function updateWalletUI(address) {
     const btn = document.getElementById('connectWalletBtn');
-    if (btn) {
-        btn.textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
+    if (btn && address) {
+        const displayAddr = typeof address === 'string' ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Connected';
+        btn.textContent = displayAddr;
         btn.className = 'btn btn-success';
         btn.onclick = disconnectWallet;
     }
@@ -123,14 +122,13 @@ function updateWalletUI(address) {
 // CORE CONTRACT CALL
 // ============================================================
 
-function callContract({ contract, functionName, functionArgs = [], onSuccess, onCancel, onError }) {
-    if (!connectedAddress) {
+async function callContract({ contract, functionName, functionArgs = [], onSuccess, onCancel, onError }) {
+    if (!userSession.isUserSignedIn()) {
         showNotification('⚠️ Please connect your wallet first!', 'warning');
         connectWallet();
         return;
     }
 
-    // Split 'SP...address.contract-name' into parts
     const lastDot = contract.lastIndexOf('.');
     const contractAddress = contract.substring(0, lastDot);
     const contractName = contract.substring(lastDot + 1);
@@ -138,17 +136,18 @@ function callContract({ contract, functionName, functionArgs = [], onSuccess, on
     console.log(`🚀 Calling ${contractAddress}.${contractName}::${functionName}`);
 
     try {
-        openContractCall({
+        await openContractCall({
             contractAddress,
             contractName,
             functionName,
             functionArgs,
             network: stacksNetwork,
             appDetails,
+            userSession,
             anchorMode: AnchorMode.Any,
             postConditionMode: PostConditionMode.Allow,
             onFinish: (data) => {
-                console.log('✅ Success! Transaction broadcasted.', data);
+                console.log('✅ Transaction broadcasted:', data);
                 if (onSuccess) onSuccess(data);
             },
             onCancel: () => {
@@ -158,7 +157,7 @@ function callContract({ contract, functionName, functionArgs = [], onSuccess, on
         });
     } catch (err) {
         console.error('❌ Error executing openContractCall:', err);
-        showNotification('❌ Transaction Error: ' + err.message, 'error');
+        showNotification('❌ Transaction Error: ' + (err.message || 'Unknown error'), 'error');
         if (onError) onError(err);
     }
 }
@@ -168,54 +167,34 @@ function callContract({ contract, functionName, functionArgs = [], onSuccess, on
 // ============================================================
 
 async function dailyCheckIn() {
-    if (!connectedAddress) {
-        showNotification('⚠️ Please connect your wallet first', 'warning');
-        connectWallet();
-        return;
-    }
-
     const btn = document.getElementById('checkInBtn');
     if (btn) { btn.textContent = '⏳ Processing...'; btn.disabled = true; }
 
-    const btnTimeout = setTimeout(() => {
-        if (btn && btn.textContent.includes('Processing')) {
-            btn.disabled = false;
-            btn.textContent = '✅ Daily Check-in';
-            showNotification('🕒 Transaction timeout. Please check your wallet.', 'warning');
-        }
-    }, 60000);
+    const resetBtn = () => { if (btn) { btn.disabled = false; btn.textContent = '✅ Daily Check-in'; } };
 
     callContract({
         contract: CONTRACT_ADDRESSES.FEB_CHECKIN,
         functionName: 'check-in',
         functionArgs: [],
         onSuccess: () => {
-            clearTimeout(btnTimeout);
             showNotification('✅ Check-in submitted successfully!', 'success');
-            if (btn) { btn.disabled = false; btn.textContent = '✅ Daily Check-in'; }
+            resetBtn();
+            updateStats();
             loadLeaderboard();
         },
         onCancel: () => {
-            clearTimeout(btnTimeout);
             showNotification('⚠️ Check-in cancelled', 'warning');
-            if (btn) { btn.disabled = false; btn.textContent = '✅ Daily Check-in'; }
+            resetBtn();
         },
         onError: (err) => {
-            clearTimeout(btnTimeout);
             console.error('Check-in error:', err);
-            showNotification('❌ Check-in failed: ' + (err.message || 'Unknown error'), 'error');
-            if (btn) { btn.disabled = false; btn.textContent = '✅ Daily Check-in'; }
+            showNotification('❌ Check-in failed', 'error');
+            resetBtn();
         }
     });
 }
 
 async function executeSwap() {
-    if (!connectedAddress) {
-        showNotification('⚠️ Please connect your wallet first', 'warning');
-        connectWallet();
-        return;
-    }
-
     const amountIn = document.getElementById('swapAmountIn')?.value;
     if (!amountIn || parseFloat(amountIn) <= 0) {
         showNotification('⚠️ Please enter a valid amount', 'warning');
@@ -224,141 +203,35 @@ async function executeSwap() {
 
     const btn = document.getElementById('executeSwapBtn');
     if (btn) { btn.textContent = '⏳ Processing...'; btn.disabled = true; }
-
-    const btnTimeout = setTimeout(() => {
-        if (btn && btn.textContent.includes('Processing')) {
-            btn.disabled = false;
-            btn.textContent = 'Swap Tokens';
-            showNotification('🕒 Swap timeout. Please check your wallet.', 'warning');
-        }
-    }, 60000);
+    const resetBtn = () => { if (btn) { btn.disabled = false; btn.textContent = 'Swap Tokens'; } };
 
     callContract({
         contract: CONTRACT_ADDRESSES.SWAP,
         functionName: 'create-swap',
-        functionArgs: [],
+        functionArgs: [], // Simple swap for demo
         onSuccess: () => {
-            clearTimeout(btnTimeout);
             showNotification('✅ Swap submitted!', 'success');
-            if (btn) { btn.disabled = false; btn.textContent = 'Swap Tokens'; }
+            resetBtn();
             updateStats();
         },
         onCancel: () => {
-            clearTimeout(btnTimeout);
             showNotification('⚠️ Swap cancelled', 'warning');
-            if (btn) { btn.disabled = false; btn.textContent = 'Swap Tokens'; }
-        }
-    });
-}
-
-async function createVault() {
-    if (!connectedAddress) {
-        showNotification('⚠️ Please connect your wallet first', 'warning');
-        connectWallet();
-        return;
-    }
-
-    const vaultName = document.getElementById('vaultName')?.value;
-    if (!vaultName) {
-        showNotification('⚠️ Please enter a vault name', 'warning');
-        return;
-    }
-
-    const btn = document.getElementById('createVaultBtn');
-    if (btn) { btn.textContent = '⏳ Processing...'; btn.disabled = true; }
-
-    const btnTimeout = setTimeout(() => {
-        if (btn && btn.textContent.includes('Processing')) {
-            btn.disabled = false;
-            btn.textContent = 'Create Vault';
-            showNotification('🕒 Creation timeout. Please check your wallet.', 'warning');
-        }
-    }, 60000);
-
-    callContract({
-        contract: CONTRACT_ADDRESSES.VAULT,
-        functionName: 'create-vault',
-        functionArgs: [],
-        onSuccess: () => {
-            clearTimeout(btnTimeout);
-            showNotification(`✅ Vault "${vaultName}" created!`, 'success');
-            if (btn) { btn.disabled = false; btn.textContent = 'Create Vault'; }
-            setTimeout(loadUserVaults, 500);
+            resetBtn();
         },
-        onCancel: () => {
-            clearTimeout(btnTimeout);
-            showNotification('⚠️ Vault creation cancelled', 'warning');
-            if (btn) { btn.disabled = false; btn.textContent = 'Create Vault'; }
-        }
+        onError: () => resetBtn()
     });
 }
 
-async function stakeInVault() {
-    if (!connectedAddress) {
-        showNotification('⚠️ Please connect your wallet first', 'warning');
-        connectWallet();
-        return;
-    }
-
-    const amount = document.getElementById('stakeAmount')?.value;
-    if (!amount || parseFloat(amount) <= 0) {
-        showNotification('⚠️ Please enter a valid amount', 'warning');
-        return;
-    }
-
-    const btn = document.getElementById('stakeBtn');
-    if (btn) { btn.textContent = '⏳ Processing...'; btn.disabled = true; }
-
-    const btnTimeout = setTimeout(() => {
-        if (btn && btn.textContent.includes('Processing')) {
-            btn.disabled = false;
-            btn.textContent = 'Stake Tokens';
-            showNotification('🕒 Stake timeout. Please check your wallet.', 'warning');
-        }
-    }, 60000);
-
-    callContract({
-        contract: CONTRACT_ADDRESSES.VAULT,
-        functionName: 'deposit',
-        functionArgs: [],
-        onSuccess: () => {
-            clearTimeout(btnTimeout);
-            showNotification(`✅ Staked ${amount} STX!`, 'success');
-            if (btn) { btn.disabled = false; btn.textContent = 'Stake Tokens'; }
-            updateStats();
-        },
-        onCancel: () => {
-            clearTimeout(btnTimeout);
-            showNotification('⚠️ Stake cancelled', 'warning');
-            if (btn) { btn.disabled = false; btn.textContent = 'Stake Tokens'; }
-        }
-    });
-}
-
-// ============================================================
-// BUILDER TOOLS
-// ============================================================
-
-function encodeStringAscii(str) {
-    const stringAsciiCV = 
-        window.stacks?.transactions?.stringAsciiCV || 
-        window.StacksTransactions?.stringAsciiCV;
-        
-    if (stringAsciiCV) {
+function encodeString(str) {
+    try {
         return stringAsciiCV(str);
+    } catch (e) {
+        console.error('Error encoding string:', e);
+        return str;
     }
-    
-    console.error('❌ StacksTransactions.stringAsciiCV not found!');
-    return str; // Fallback to raw string (might fail on-chain)
 }
 
 async function registerBuilder() {
-    if (!connectedAddress) {
-        showNotification('⚠️ Please connect your wallet first', 'warning');
-        connectWallet();
-        return;
-    }
-
     const name = document.getElementById('builderName')?.value?.trim();
     const profileUrl = document.getElementById('builderProfile')?.value?.trim();
 
@@ -369,188 +242,43 @@ async function registerBuilder() {
 
     const btn = document.getElementById('registerBuilderBtn');
     if (btn) { btn.textContent = '⏳ Processing...'; btn.disabled = true; }
-
-    const btnTimeout = setTimeout(() => {
-        if (btn && btn.textContent.includes('Processing')) {
-            btn.disabled = false;
-            btn.textContent = 'Register Builder';
-            showNotification('🕒 Registration timeout. Please check your wallet.', 'warning');
-        }
-    }, 60000);
+    const resetBtn = () => { if (btn) { btn.disabled = false; btn.textContent = 'Register Builder'; } };
 
     callContract({
         contract: CONTRACT_ADDRESSES.DEFI_TOOLS,
         functionName: 'register-builder',
-        functionArgs: [encodeStringAscii(name), encodeStringAscii(profileUrl)],
+        functionArgs: [encodeString(name), encodeString(profileUrl)],
         onSuccess: () => {
-            clearTimeout(btnTimeout);
             showNotification(`✅ Registered as Builder: ${name}!`, 'success');
-            if (btn) { btn.disabled = false; btn.textContent = 'Register Builder'; }
-            document.getElementById('builderName').value = '';
-            document.getElementById('builderProfile').value = '';
+            resetBtn();
         },
         onCancel: () => {
-            clearTimeout(btnTimeout);
             showNotification('⚠️ Registration cancelled', 'warning');
-            if (btn) { btn.disabled = false; btn.textContent = 'Register Builder'; }
-        }
-    });
-}
-
-async function updateBuilderStatus() {
-    if (!connectedAddress) {
-        showNotification('⚠️ Please connect your wallet first', 'warning');
-        connectWallet();
-        return;
-    }
-
-    const status = document.getElementById('builderStatus')?.value?.trim();
-    if (!status) {
-        showNotification('⚠️ Please enter a status', 'warning');
-        return;
-    }
-
-    const btn = document.getElementById('updateStatusBtn');
-    if (btn) { btn.textContent = '⏳ Processing...'; btn.disabled = true; }
-
-    const btnTimeout = setTimeout(() => {
-        if (btn && btn.textContent.includes('Processing')) {
-            btn.disabled = false;
-            btn.textContent = 'Update Status';
-            showNotification('🕒 Status update timeout. Please check your wallet.', 'warning');
-        }
-    }, 60000);
-
-    callContract({
-        contract: CONTRACT_ADDRESSES.DEFI_TOOLS,
-        functionName: 'update-status',
-        functionArgs: [encodeStringAscii(status)],
-        onSuccess: () => {
-            clearTimeout(btnTimeout);
-            showNotification('✅ Status updated!', 'success');
-            if (btn) { btn.disabled = false; btn.textContent = 'Update Status'; }
-            document.getElementById('builderStatus').value = '';
+            resetBtn();
         },
-        onCancel: () => {
-            clearTimeout(btnTimeout);
-            showNotification('⚠️ Status update cancelled', 'warning');
-            if (btn) { btn.disabled = false; btn.textContent = 'Update Status'; }
-        }
-    });
-}
-
-async function requestBuilderService() {
-    if (!connectedAddress) {
-        showNotification('⚠️ Please connect your wallet first', 'warning');
-        connectWallet();
-        return;
-    }
-
-    const serviceType = document.getElementById('serviceType')?.value;
-    const details = document.getElementById('serviceDetails')?.value?.trim();
-
-    if (!details) {
-        showNotification('⚠️ Please provide details', 'warning');
-        return;
-    }
-
-    const btn = document.getElementById('requestServiceBtn');
-    if (btn) { btn.textContent = '⏳ Processing...'; btn.disabled = true; }
-
-    const btnTimeout = setTimeout(() => {
-        if (btn && btn.textContent.includes('Processing')) {
-            btn.disabled = false;
-            btn.textContent = 'Request Service';
-            showNotification('🕒 Service request timeout. Please check your wallet.', 'warning');
-        }
-    }, 60000);
-
-    callContract({
-        contract: CONTRACT_ADDRESSES.DEFI_TOOLS,
-        functionName: 'request-service',
-        functionArgs: [encodeStringAscii(serviceType), encodeStringAscii(details)],
-        onSuccess: () => {
-            clearTimeout(btnTimeout);
-            showNotification('✅ Service requested!', 'success');
-            if (btn) { btn.disabled = false; btn.textContent = 'Request Service'; }
-            document.getElementById('serviceDetails').value = '';
-        },
-        onCancel: () => {
-            clearTimeout(btnTimeout);
-            showNotification('⚠️ Service request cancelled', 'warning');
-            if (btn) { btn.disabled = false; btn.textContent = 'Request Service'; }
-        }
-    });
-}
-
-async function payProtocolFee() {
-    if (!connectedAddress) {
-        showNotification('⚠️ Please connect your wallet first', 'warning');
-        connectWallet();
-        return;
-    }
-
-    const btn = document.getElementById('payFeeBtn');
-    if (btn) { btn.textContent = '⏳ Processing...'; btn.disabled = true; }
-
-    const btnTimeout = setTimeout(() => {
-        if (btn && btn.textContent.includes('Processing')) {
-            btn.disabled = false;
-            btn.textContent = 'Pay 0.02 STX Fee';
-            showNotification('🕒 Payment timeout. Please check your wallet.', 'warning');
-        }
-    }, 60000);
-
-    callContract({
-        contract: CONTRACT_ADDRESSES.FEE_DISTRIBUTOR,
-        functionName: 'pay-fee',
-        functionArgs: [],
-        onSuccess: () => {
-            clearTimeout(btnTimeout);
-            showNotification('✅ Fee of 0.02 STX paid!', 'success');
-            if (btn) { btn.disabled = false; btn.textContent = 'Pay 0.02 STX Fee'; }
-        },
-        onCancel: () => {
-            clearTimeout(btnTimeout);
-            showNotification('⚠️ Payment cancelled', 'warning');
-            if (btn) { btn.disabled = false; btn.textContent = 'Pay 0.02 STX Fee'; }
-        }
+        onError: () => resetBtn()
     });
 }
 
 // Claim 1 STX from the daily distributor
 async function claimDistribution() {
-    if (!connectedAddress) {
-        showNotification('⚠️ Please connect your wallet first', 'warning');
-        connectWallet();
-        return;
-    }
-
     const btn = document.getElementById('claimDistributionBtn');
     if (btn) { btn.textContent = '⏳ Processing...'; btn.disabled = true; }
-
-    const btnTimeout = setTimeout(() => {
-        if (btn && btn.textContent.includes('Processing')) {
-            btn.disabled = false;
-            btn.textContent = '🎁 Claim 1 STX';
-            showNotification('🕒 Distribution timeout. Please check your wallet.', 'warning');
-        }
-    }, 60000);
+    const resetBtn = () => { if (btn) { btn.disabled = false; btn.textContent = '🎁 Claim 1 STX'; } };
 
     callContract({
         contract: CONTRACT_ADDRESSES.STX_DISTRIBUTOR,
         functionName: 'claim',
         functionArgs: [],
         onSuccess: () => {
-            clearTimeout(btnTimeout);
-            showNotification('✅ 1 STX claimed successfully! Check your wallet.', 'success');
-            if (btn) { btn.disabled = false; btn.textContent = '🎁 Claim 1 STX'; }
+            showNotification('✅ 1 STX claimed successfully!', 'success');
+            resetBtn();
         },
         onCancel: () => {
-            clearTimeout(btnTimeout);
-            showNotification('⚠️ Claim cancelled. Try again after 24 hours.', 'warning');
-            if (btn) { btn.disabled = false; btn.textContent = '🎁 Claim 1 STX'; }
-        }
+            showNotification('⚠️ Claim cancelled', 'warning');
+            resetBtn();
+        },
+        onError: () => resetBtn()
     });
 }
 
@@ -560,12 +288,11 @@ async function claimDistribution() {
 
 async function fetchAccountBalance(address) {
     try {
-        const baseUrl = 'https://api.hiro.so';
-        const response = await fetch(`${baseUrl}/extended/v1/address/${address}/balances`);
+        const response = await fetch(`https://api.hiro.so/extended/v1/address/${address}/balances`);
         if (!response.ok) return;
         const data = await response.json();
         const balance = (parseInt(data.stx.balance) / 1000000).toLocaleString(undefined, {
-            minimumFractionDigits: 2, maximumFractionDigits: 4
+            minimumFractionDigits: 2, maximumFractionDigits: 2
         });
         const el = document.getElementById('balanceIn');
         if (el) { el.textContent = `${balance} STX`; el.style.color = '#4facfe'; }
@@ -587,21 +314,16 @@ function calculateSwapOutput() {
     if (rateEl) rateEl.textContent = `1 ${tokenIn} = ${rate} ${tokenOut}`;
 }
 
-function swapDirection() {
-    const tokenIn = document.getElementById('tokenIn');
-    const tokenOut = document.getElementById('tokenOut');
-    if (!tokenIn || !tokenOut) return;
-    const temp = tokenIn.value;
-    tokenIn.value = tokenOut.value;
-    tokenOut.value = temp;
-    calculateSwapOutput();
-}
-
 function loadLeaderboard() {
     const tbody = document.getElementById('leaderboardBody');
     if (!tbody) return;
+    const mockData = [
+        { rank: 1, username: "Aleekhoso 🔵 🟣", score: 28300, streak: 12, contributions: 283, contracts: 200, rewards: "153 STX" },
+        { rank: 2, username: "StacksBuilder", score: 15420, streak: 45, contributions: 127, contracts: 85, rewards: "98 STX" },
+        { rank: 3, username: "ClarityDev", score: 12850, streak: 38, contributions: 93, contracts: 64, rewards: "82 STX" }
+    ];
     tbody.innerHTML = '';
-    mockLeaderboardData.forEach((user, index) => {
+    mockData.forEach((user, index) => {
         const row = document.createElement('tr');
         row.style.animation = `fadeInUp 0.6s ease-out ${index * 0.1}s backwards`;
         const rankClass = user.rank <= 3 ? `rank-badge rank-${user.rank}` : 'rank-badge';
@@ -609,19 +331,14 @@ function loadLeaderboard() {
             <td><div class="${rankClass}">${user.rank}</div></td>
             <td>
                 <div style="font-weight:600">${user.username}</div>
-                <div style="font-size:0.75rem;color:var(--text-muted);font-family:monospace">
-                    ${user.rank === 1 && connectedAddress ? connectedAddress.slice(0, 8) + '...' : 'SP...'}
-                </div>
+                <div style="font-size:0.75rem;color:var(--text-muted);font-family:monospace">${user.rank === 1 && connectedAddress ? connectedAddress.slice(0, 8) + '...' : 'SP2...'}</div>
             </td>
             <td>
                 <div style="font-weight:700;color:#4facfe">${user.score.toLocaleString()}</div>
                 <div style="font-size:0.75rem;color:var(--text-muted)">${user.contracts} contracts • ${user.rewards}</div>
             </td>
             <td><span class="badge badge-warning">🔥 ${user.streak} days</span></td>
-            <td>
-                <div style="font-weight:600;color:#4facfe">${user.contributions}</div>
-                <div style="font-size:0.75rem;color:var(--text-muted)">GitHub PRs</div>
-            </td>
+            <td><div style="font-weight:600;color:#4facfe">${user.contributions}</div></td>
         `;
         tbody.appendChild(row);
     });
@@ -630,7 +347,7 @@ function loadLeaderboard() {
 function loadUserVaults() {
     const container = document.getElementById('myVaults');
     if (!container) return;
-    if (!connectedAddress) {
+    if (!userSession.isUserSignedIn()) {
         container.innerHTML = '<div class="card" style="grid-column:1/-1;text-align:center;color:var(--text-muted)">Connect wallet to view your vaults</div>';
         return;
     }
@@ -638,18 +355,14 @@ function loadUserVaults() {
         { name: 'Community Treasury', balance: '2,450 STX', signers: '3/5', apy: '12.5%' },
         { name: 'Development Fund', balance: '1,820 STX', signers: '2/3', apy: '10.2%' }
     ];
-    container.innerHTML = vaults.map((v, i) => `
-        <div class="card" style="animation:slideInRight 0.6s ease-out ${i * 0.1}s backwards">
-            <h4 style="margin-bottom:1rem">${v.name}</h4>
-            <div style="margin-bottom:0.75rem">
+    container.innerHTML = vaults.map(v => `
+        <div class="card">
+            <h4>${v.name}</h4>
+            <div style="margin:1rem 0">
                 <div style="font-size:0.875rem;color:var(--text-muted)">Balance</div>
                 <div style="font-size:1.25rem;font-weight:700;color:#4facfe">${v.balance}</div>
             </div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:1rem">
-                <div><div style="font-size:0.75rem;color:var(--text-muted)">Signers</div><div style="font-weight:600">${v.signers}</div></div>
-                <div><div style="font-size:0.75rem;color:var(--text-muted)">APY</div><div style="font-weight:600;color:#4facfe">${v.apy}</div></div>
-            </div>
-            <button class="btn btn-secondary" style="width:100%;padding:0.5rem;font-size:0.875rem">Manage</button>
+            <button class="btn btn-secondary" style="width:100%">Manage</button>
         </div>
     `).join('');
 }
@@ -668,9 +381,9 @@ function animateValue(id, start, end, duration, formatter = v => v.toLocaleStrin
 }
 
 function updateStats() {
-    animateValue('totalUsers', 1100, 1247, 1000);
-    animateValue('totalVolume', 2100000, 2400000, 1000, v => `$${(v / 1000000).toFixed(1)}M`);
-    animateValue('totalLocked', 5200000, 5800000, 1000, v => `$${(v / 1000000).toFixed(1)}M`);
+    animateValue('totalUsers', 1200, 1247, 1000);
+    animateValue('totalVolume', 2300000, 2400000, 1000, v => `$${(v / 1000000).toFixed(1)}M`);
+    animateValue('totalLocked', 5600000, 5800000, 1000, v => `$${(v / 1000000).toFixed(1)}M`);
 }
 
 // ============================================================
@@ -678,78 +391,39 @@ function updateStats() {
 // ============================================================
 
 function attachListeners() {
-    const connectBtn = document.getElementById('connectWalletBtn');
-    if (connectBtn) connectBtn.onclick = connectWallet;
-
-    const checkInBtn = document.getElementById('checkInBtn');
-    if (checkInBtn) checkInBtn.onclick = dailyCheckIn;
-
-    const executeSwapBtn = document.getElementById('executeSwapBtn');
-    if (executeSwapBtn) executeSwapBtn.onclick = executeSwap;
-
-    const swapAmountIn = document.getElementById('swapAmountIn');
-    if (swapAmountIn) swapAmountIn.addEventListener('input', calculateSwapOutput);
-
-    const swapDirectionBtn = document.getElementById('swapDirectionBtn');
-    if (swapDirectionBtn) swapDirectionBtn.onclick = swapDirection;
-
-    const createVaultBtn = document.getElementById('createVaultBtn');
-    if (createVaultBtn) createVaultBtn.onclick = createVault;
-
-    const stakeBtn = document.getElementById('stakeBtn');
-    if (stakeBtn) stakeBtn.onclick = stakeInVault;
-
-    const registerBuilderBtn = document.getElementById('registerBuilderBtn');
-    if (registerBuilderBtn) registerBuilderBtn.onclick = registerBuilder;
-
-    const updateStatusBtn = document.getElementById('updateStatusBtn');
-    if (updateStatusBtn) updateStatusBtn.onclick = updateBuilderStatus;
-
-    const requestServiceBtn = document.getElementById('requestServiceBtn');
-    if (requestServiceBtn) requestServiceBtn.onclick = requestBuilderService;
-
-    const payFeeBtn = document.getElementById('payFeeBtn');
-    if (payFeeBtn) payFeeBtn.onclick = payProtocolFee;
-
-    const claimDistributionBtn = document.getElementById('claimDistributionBtn');
-    if (claimDistributionBtn) claimDistributionBtn.onclick = claimDistribution;
+    document.getElementById('connectWalletBtn')?.addEventListener('click', connectWallet);
+    document.getElementById('checkInBtn')?.addEventListener('click', dailyCheckIn);
+    document.getElementById('executeSwapBtn')?.addEventListener('click', executeSwap);
+    document.getElementById('swapAmountIn')?.addEventListener('input', calculateSwapOutput);
+    document.getElementById('registerBuilderBtn')?.addEventListener('click', registerBuilder);
+    document.getElementById('claimDistributionBtn')?.addEventListener('click', claimDistribution);
 }
 
-// Auto-initialize
 (function init() {
-    console.log('🚀 StacksRank ESM initializing...');
+    console.log('🚀 StacksRank initializing...');
     
-    // Export to window for global access
-    window.connectWallet = connectWallet;
-    window.dailyCheckIn = dailyCheckIn;
-    window.executeSwap = executeSwap;
-    window.createVault = createVault;
-    window.stakeInVault = stakeInVault;
-    window.claimDistribution = claimDistribution;
-    window.registerBuilder = registerBuilder;
-    window.updateBuilderStatus = updateBuilderStatus;
-    window.requestBuilderService = requestBuilderService;
-    window.payProtocolFee = payProtocolFee;
-
-    // Check if already logged in
     if (userSession.isUserSignedIn()) {
         const userData = userSession.loadUserData();
-        connectedAddress = userData.profile.stxAddress.mainnet;
+        connectedAddress = userData.profile.stxAddress.mainnet || userData.profile.stxAddress.testnet || userData.profile.stxAddress;
+        if (typeof connectedAddress === 'object') connectedAddress = connectedAddress.address || Object.values(connectedAddress)[0];
         updateWalletUI(connectedAddress);
         fetchAccountBalance(connectedAddress);
     }
 
-    // Attach listeners
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', attachListeners);
+        window.addEventListener('load', () => {
+            attachListeners();
+            loadLeaderboard();
+            updateStats();
+            loadUserVaults();
+        });
     } else {
-        attachListeners();
+        setTimeout(() => {
+            attachListeners();
+            loadLeaderboard();
+            updateStats();
+            loadUserVaults();
+        }, 100);
     }
-    
-    // Refresh UI
-    loadLeaderboard();
-    updateStats();
-    loadUserVaults();
 })();
 
-console.log('✨ StacksRank app-leather.js loaded!');
