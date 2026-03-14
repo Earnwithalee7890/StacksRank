@@ -23,6 +23,15 @@
   
   <!-- Standard Stacks.js Libraries are now imported directly in app-leather.js as modules -->
 
+  <!-- Stacks.js Requirements (Buffer Polyfill) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/buffer/6.0.3/buffer.min.js"></script>
+  <script>
+    if (typeof window !== 'undefined') {
+      window.Buffer = window.Buffer || buffer.Buffer;
+      window.global = window;
+    }
+  </script>
+
   <link rel="stylesheet" href="src/styles/globals.css">
 </head>
 

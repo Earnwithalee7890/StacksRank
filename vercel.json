@@ -1,6 +1,3 @@
 {
-    "installCommand": "echo skipping install",
-    "buildCommand": "echo skipping build",
-    "outputDirectory": ".",
     "cleanUrls": true
 }

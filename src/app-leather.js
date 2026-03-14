@@ -1,12 +1,4 @@
-// StacksRank - Leather Wallet Integration (v1.2.3 - "Secret Sauce" Build)
-import { Buffer } from 'https://esm.sh/buffer@6.0.3';
-
-// CRITICAL: Stacks.js requires Buffer to be available globally in the browser
-if (typeof window !== 'undefined') {
-    window.Buffer = Buffer;
-    window.global = window;
-}
-
+// StacksRank - Leather Wallet Integration (v1.2.4 - Production Deployed Build)
 import { openContractCall, showConnect, AppConfig, UserSession } from 'https://esm.sh/@stacks/connect@8.2.2';
 import { StacksMainnet } from 'https://esm.sh/@stacks/network@7.2.0';
 import { AnchorMode, PostConditionMode, stringAsciiCV } from 'https://esm.sh/@stacks/transactions@7.3.0';
