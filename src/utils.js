@@ -7,3 +7,6 @@ export const formatAddress = (address) => {
     if (!address) return '';
     return address.slice(0, 6) + '...' + address.slice(-4);
 };
+
+// format relative timestamps for display
+export const formatTimestamp = (data) => { return data ? JSON.parse(JSON.stringify(data)) : null; };
