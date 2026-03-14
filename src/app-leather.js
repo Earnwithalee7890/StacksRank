@@ -1,7 +1,8 @@
-// StacksRank - Leather Wallet Integration (v1.1.0 - ESM Module Build)
-import { openContractCall } from 'https://cdn.jsdelivr.net/npm/@stacks/connect@8.2.3/+esm';
+// StacksRank - Leather Wallet Integration (v1.2.0 - ESM Module Build)
+import { openContractCall, showConnect, authenticate } from 'https://cdn.jsdelivr.net/npm/@stacks/connect@8.2.3/+esm';
 import { StacksMainnet } from 'https://cdn.jsdelivr.net/npm/@stacks/network@7.2.0/+esm';
 import { AnchorMode, PostConditionMode, stringAsciiCV } from 'https://cdn.jsdelivr.net/npm/@stacks/transactions@7.3.0/+esm';
+import { AppConfig, UserSession } from 'https://cdn.jsdelivr.net/npm/@stacks/connect@8.2.3/+esm';
 
 // ============================================================
 // CONFIG
@@ -23,6 +24,8 @@ const appDetails = {
 };
 
 // State
+const appConfig = new AppConfig(['store_write', 'publish_data']);
+const userSession = new UserSession({ appConfig });
 let connectedAddress = null;
 let stacksNetwork = new StacksMainnet();
 
@@ -34,14 +37,6 @@ const mockLeaderboardData = [
     { rank: 2, username: "StacksBuilder", score: 15420, streak: 45, contributions: 127, contracts: 85, rewards: "98 STX" },
     { rank: 3, username: "ClarityDev", score: 12850, streak: 38, contributions: 93, contracts: 64, rewards: "82 STX" }
 ];
-
-// Export to window for global access (Fallback for legacy components)
-window.connectWallet = connectWallet;
-window.dailyCheckIn = dailyCheckIn;
-window.executeSwap = executeSwap;
-window.createVault = createVault;
-window.stakeInVault = stakeInVault;
-window.claimDistribution = claimDistribution;
 
 // ============================================================
 // HELPERS
@@ -86,42 +81,23 @@ function getNetwork() {
 // ============================================================
 
 async function connectWallet() {
-    console.log('🔗 Connecting wallet...');
-
-    if (!window.LeatherProvider) {
-        showNotification('📦 Please install Leather wallet extension!', 'warning');
-        window.open('https://leather.io/install-extension', '_blank');
-        return;
-    }
-
-    try {
-        const response = await window.LeatherProvider.request('getAddresses');
-        console.log('📬 getAddresses response:', response);
-
-        let stxAddr = null;
-
-        if (response?.result?.addresses) {
-            const found = response.result.addresses.find(a => a.symbol === 'STX');
-            if (found) stxAddr = found.address;
-        }
-
-        if (!stxAddr && response?.result?.addresses?.[0]) {
-            stxAddr = response.result.addresses[0].address;
-        }
-
-        if (stxAddr) {
-            connectedAddress = stxAddr;
-            updateWalletUI(stxAddr);
-            showNotification('✅ Wallet connected: ' + stxAddr.slice(0, 8) + '...', 'success');
-            fetchAccountBalance(stxAddr);
-        } else {
-            showNotification('❌ Could not get STX address', 'error');
-        }
-
-    } catch (error) {
-        console.error('❌ Wallet connection error:', error);
-        showNotification('❌ Failed to connect: ' + (error.message || error), 'error');
-    }
+    console.log('🔗 Connecting wallet via Connect...');
+    
+    showConnect({
+        appDetails,
+        onFinish: () => {
+             const userData = userSession.loadUserData();
+             connectedAddress = userData.profile.stxAddress.mainnet || userData.profile.stxAddress.testnet;
+             updateWalletUI(connectedAddress);
+             showNotification('✅ Wallet connected: ' + connectedAddress.slice(0, 8) + '...', 'success');
+             fetchAccountBalance(connectedAddress);
+        },
+        onCancel: () => {
+             console.log('User cancelled login');
+             showNotification('⚠️ Connection cancelled', 'warning');
+        },
+        userSession
+    });
 }
 
 function disconnectWallet() {
@@ -738,20 +714,37 @@ function attachListeners() {
 (function init() {
     console.log('🚀 StacksRank ESM initializing...');
     
-    // In ESM, we can attach listeners immediately if the script is deferred/type="module"
+    // Export to window for global access
+    window.connectWallet = connectWallet;
+    window.dailyCheckIn = dailyCheckIn;
+    window.executeSwap = executeSwap;
+    window.createVault = createVault;
+    window.stakeInVault = stakeInVault;
+    window.claimDistribution = claimDistribution;
+    window.registerBuilder = registerBuilder;
+    window.updateBuilderStatus = updateBuilderStatus;
+    window.requestBuilderService = requestBuilderService;
+    window.payProtocolFee = payProtocolFee;
+
+    // Check if already logged in
+    if (userSession.isUserSignedIn()) {
+        const userData = userSession.loadUserData();
+        connectedAddress = userData.profile.stxAddress.mainnet;
+        updateWalletUI(connectedAddress);
+        fetchAccountBalance(connectedAddress);
+    }
+
+    // Attach listeners
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-             attachListeners();
-             loadLeaderboard();
-             updateStats();
-             loadUserVaults();
-        });
+        document.addEventListener('DOMContentLoaded', attachListeners);
     } else {
         attachListeners();
-        loadLeaderboard();
-        updateStats();
-        loadUserVaults();
     }
+    
+    // Refresh UI
+    loadLeaderboard();
+    updateStats();
+    loadUserVaults();
 })();
 
 console.log('✨ StacksRank app-leather.js loaded!');
