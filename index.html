@@ -21,10 +21,20 @@
 
   <!-- Leather Wallet Integration is handled by src/app-leather.js -->
   
-  <!-- Standard Stacks.js Libraries - Stable v7 Verified Links -->
-  <script src="https://unpkg.com/@stacks/connect@7.10.1/dist/connect.umd.js"></script>
-  <script src="https://unpkg.com/@stacks/transactions@6.13.0/dist/index.umd.js"></script>
-  <script src="https://unpkg.com/@stacks/network@6.13.0/dist/index.umd.js"></script>
+  <!-- Standard Stacks.js Libraries - Strong Redundant CDN Links -->
+  <script src="https://cdn.jsdelivr.net/npm/@stacks/connect@7.8.2/dist/connect.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@stacks/transactions@6.13.0/dist/index.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@stacks/network@6.13.0/dist/index.umd.js"></script>
+  
+  <script>
+    window.addEventListener('load', () => {
+      console.log('📦 Library Status:', {
+        Connect: !!(window.StacksConnect || window.Connect),
+        Tx: !!(window.StacksTransactions || window.StacksTx),
+        Net: !!(window.StacksNetwork || window.StacksNet)
+      });
+    });
+  </script>
 
   <link rel="stylesheet" href="src/styles/globals.css">
 </head>

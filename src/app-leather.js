@@ -168,20 +168,22 @@ function callContract({ contract, functionName, functionArgs = [], onSuccess, on
 
     console.log(`🚀 Calling ${contractAddress}.${contractName}::${functionName}`);
 
-    // More resilient detection for @stacks/connect across versions
+    // Aggressive detection for @stacks/connect across all known UMD naming conventions
     const openContractCall = 
         window.StacksConnect?.openContractCall || 
-        window.stacksConnect?.openContractCall ||
         window.Connect?.openContractCall ||
-        (window.StacksConnect && typeof window.StacksConnect === 'function' ? window.StacksConnect.openContractCall : null);
+        window.stacksConnect?.openContractCall ||
+        (typeof window.StacksConnect === 'function' ? window.StacksConnect.openContractCall : null) ||
+        (window.StacksConnect?.StacksConnect ? window.StacksConnect.StacksConnect.openContractCall : null);
 
     if (!openContractCall) {
-        console.error('❌ StacksConnect library not detected. Globals:', {
-            StacksConnect: !!window.StacksConnect,
-            stacksConnect: !!window.stacksConnect,
-            Connect: !!window.Connect
-        });
-        showNotification('❌ Wallet integration library not found. Retrying...', 'warning');
+        console.error('❌ StacksConnect library not detected. Scanning window for fallbacks...');
+        
+        // Debug naming help
+        const potentialKeys = Object.keys(window).filter(k => k.toLowerCase().includes('connect') || k.toLowerCase().includes('stacks'));
+        console.log('🔍 Potential matches on window:', potentialKeys);
+
+        showNotification('❌ Wallet library failed to load. Retrying in 2s...', 'warning');
         
         // Failsafe: if library isn't there yet, wait 2 seconds and try again once
         setTimeout(() => {
