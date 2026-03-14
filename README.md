@@ -48,7 +48,7 @@ This project is meticulously crafted to maximize the **tier-ranking criteria** d
 
 We've launched an easy-to-use SDK for developers who want to integrate StacksRank data or Clarity utilities into their own apps.
 
-**`npm install stacksrank-sdk`**
+**`npm install @earnwithalee/stacksrank-sdk`**
 
 - **Clarity Encoding**: Pure JS encoding for all Clarity types.
 - **Contract Registry**: Programmatic access to all StacksRank contract addresses.
