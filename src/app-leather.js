@@ -74,14 +74,15 @@ function showNotification(message, type = 'info') {
 // ============================================================
 function getNetwork() {
     if (stacksNetwork) return stacksNetwork;
-    // Use StacksNetwork from @stacks/network CDN
-    // v7+ often uses StacksNetwork as the global
-    const NetworkClass = 
+    
+    // V8 Network detection
+    const StacksMainnet = 
+        window.stacks?.network?.StacksMainnet || 
         window.StacksNetwork?.StacksMainnet || 
         window.StacksMainnet;
         
-    if (NetworkClass) {
-        stacksNetwork = new NetworkClass();
+    if (StacksMainnet) {
+        stacksNetwork = new StacksMainnet();
     }
     return stacksNetwork;
 }
@@ -168,57 +169,46 @@ function callContract({ contract, functionName, functionArgs = [], onSuccess, on
 
     console.log(`🚀 Calling ${contractAddress}.${contractName}::${functionName}`);
 
-    // Ultra-robust detection. Stacks libraries are notoriously inconsistent with global variable naming in UMD.
-    // We check every known variation including the 'window.stacks' namespace discovered in your environment.
+    // V8 SPECIFIC DETECTION (Matching your working "stx-daily-check-in-hiro" repo)
     const openContractCall = 
-        window.StacksConnect?.openContractCall || 
-        window.Connect?.openContractCall ||
-        window.stacks?.connect?.openContractCall ||
-        window.stacks?.openContractCall ||
-        window.stacksConnect?.openContractCall ||
-        (typeof window.StacksConnect === 'function' ? window.StacksConnect.openContractCall : null) ||
-        (window.StacksConnect?.StacksConnect ? window.StacksConnect.StacksConnect.openContractCall : null);
+        window.stacks?.connect?.openContractCall || 
+        window.StacksConnect?.openContractCall ||
+        window.Connect?.openContractCall;
 
     if (!openContractCall) {
-        console.error('❌ Wallet library NOT found in standard globals.');
-        console.log('🔍 Window Scan:', {
-            StacksConnect: !!window.StacksConnect,
-            Connect: !!window.Connect,
+        console.error('❌ Wallet library NOT detected. Globals:', {
             stacks: !!window.stacks,
-            stacks_connect: !!window.stacks?.connect
+            stacks_connect: !!window.stacks?.connect,
+            StacksConnect: !!window.StacksConnect
         });
-
-        showNotification('❌ Wallet library failed to load. Attempting auto-fix...', 'warning');
-        
-        // Failsafe: if library isn't there yet, wait 2 seconds and try again once
-        setTimeout(() => {
-            const retryCall = window.StacksConnect?.openContractCall || window.Connect?.openContractCall;
-            if (retryCall) {
-                console.log('🔄 Library found on retry!');
-                return callContract({ contract, functionName, functionArgs, onSuccess, onCancel });
-            } else {
-                showNotification('❌ Please Hard-Refresh (Ctrl+F5).', 'error');
-                if (onCancel) onCancel();
-            }
-        }, 2000);
+        showNotification('❌ Wallet library failed to load. Please Hard-Refresh.', 'error');
+        if (onCancel) onCancel();
         return;
     }
+
+    // Get V8 constants from global objects
+    const AnchorMode = window.stacks?.transactions?.AnchorMode || window.StacksTransactions?.AnchorMode || { Any: 0x03 };
+    const PostConditionMode = window.stacks?.transactions?.PostConditionMode || window.StacksTransactions?.PostConditionMode || { Allow: 0x01 };
+    
+    // Get Network
+    const network = getNetwork();
 
     try {
         openContractCall({
             contractAddress,
             contractName,
             functionName,
-            functionArgs: functionArgs || [],
-            network: getNetwork(),
+            functionArgs,
+            network,
             appDetails,
-            postConditionMode: 1, // PostConditionMode.Allow
+            anchorMode: AnchorMode.Any,
+            postConditionMode: PostConditionMode.Allow,
             onFinish: (data) => {
-                console.log('✅ Transaction broadcasted:', data);
+                console.log('✅ Success! Transaction broadcasted.', data);
                 if (onSuccess) onSuccess(data);
             },
             onCancel: () => {
-                console.log('⚠️ User cancelled');
+                console.log('❌ Transaction cancelled by user.');
                 if (onCancel) onCancel();
             }
         });
