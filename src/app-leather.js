@@ -168,22 +168,27 @@ function callContract({ contract, functionName, functionArgs = [], onSuccess, on
 
     console.log(`🚀 Calling ${contractAddress}.${contractName}::${functionName}`);
 
-    // Aggressive detection for @stacks/connect across all known UMD naming conventions
+    // Ultra-robust detection. Stacks libraries are notoriously inconsistent with global variable naming in UMD.
+    // We check every known variation including the 'window.stacks' namespace discovered in your environment.
     const openContractCall = 
         window.StacksConnect?.openContractCall || 
         window.Connect?.openContractCall ||
+        window.stacks?.connect?.openContractCall ||
+        window.stacks?.openContractCall ||
         window.stacksConnect?.openContractCall ||
         (typeof window.StacksConnect === 'function' ? window.StacksConnect.openContractCall : null) ||
         (window.StacksConnect?.StacksConnect ? window.StacksConnect.StacksConnect.openContractCall : null);
 
     if (!openContractCall) {
-        console.error('❌ StacksConnect library not detected. Scanning window for fallbacks...');
-        
-        // Debug naming help
-        const potentialKeys = Object.keys(window).filter(k => k.toLowerCase().includes('connect') || k.toLowerCase().includes('stacks'));
-        console.log('🔍 Potential matches on window:', potentialKeys);
+        console.error('❌ Wallet library NOT found in standard globals.');
+        console.log('🔍 Window Scan:', {
+            StacksConnect: !!window.StacksConnect,
+            Connect: !!window.Connect,
+            stacks: !!window.stacks,
+            stacks_connect: !!window.stacks?.connect
+        });
 
-        showNotification('❌ Wallet library failed to load. Retrying in 2s...', 'warning');
+        showNotification('❌ Wallet library failed to load. Attempting auto-fix...', 'warning');
         
         // Failsafe: if library isn't there yet, wait 2 seconds and try again once
         setTimeout(() => {
