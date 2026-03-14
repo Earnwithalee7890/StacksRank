@@ -168,16 +168,32 @@ function callContract({ contract, functionName, functionArgs = [], onSuccess, on
 
     console.log(`🚀 Calling ${contractAddress}.${contractName}::${functionName}`);
 
-    // Standard detection for @stacks/connect UMD (v7/v8)
+    // More resilient detection for @stacks/connect across versions
     const openContractCall = 
         window.StacksConnect?.openContractCall || 
         window.stacksConnect?.openContractCall ||
-        window.Connect?.openContractCall;
+        window.Connect?.openContractCall ||
+        (window.StacksConnect && typeof window.StacksConnect === 'function' ? window.StacksConnect.openContractCall : null);
 
     if (!openContractCall) {
-        console.error('❌ StacksConnect library not detected on page.');
-        showNotification('❌ Wallet library failed to load. Please Hard-Refresh (Ctrl+F5).', 'error');
-        if (onCancel) onCancel(); // Reset button
+        console.error('❌ StacksConnect library not detected. Globals:', {
+            StacksConnect: !!window.StacksConnect,
+            stacksConnect: !!window.stacksConnect,
+            Connect: !!window.Connect
+        });
+        showNotification('❌ Wallet integration library not found. Retrying...', 'warning');
+        
+        // Failsafe: if library isn't there yet, wait 2 seconds and try again once
+        setTimeout(() => {
+            const retryCall = window.StacksConnect?.openContractCall || window.Connect?.openContractCall;
+            if (retryCall) {
+                console.log('🔄 Library found on retry!');
+                return callContract({ contract, functionName, functionArgs, onSuccess, onCancel });
+            } else {
+                showNotification('❌ Please Hard-Refresh (Ctrl+F5).', 'error');
+                if (onCancel) onCancel();
+            }
+        }, 2000);
         return;
     }
 
