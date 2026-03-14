@@ -2,7 +2,7 @@
 name = "simnet"
 
 [accounts.deployer]
-mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
+mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
 balance = 100000000000000
 
 [accounts.wallet_1]
