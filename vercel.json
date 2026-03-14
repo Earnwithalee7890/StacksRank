@@ -1,4 +1,15 @@
 {
-    "outputDirectory": ".",
+    "version": 2,
+    "builds": [
+        {
+            "src": "package.json",
+            "use": "@vercel/static-build",
+            "config": {}
+        }
+    ],
+    "routes": [
+        { "handle": "filesystem" },
+        { "src": "/(.*)", "dest": "/$1" }
+    ],
     "cleanUrls": true
 }
