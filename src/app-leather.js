@@ -27,6 +27,23 @@ let connectedAddress = null;
 let stacksNetwork = new StacksMainnet();
 
 // ============================================================
+// LEADERBOARD DATA
+// ============================================================
+const mockLeaderboardData = [
+    { rank: 1, username: "Aleekhoso 🔵 🟣", score: 28300, streak: 12, contributions: 283, contracts: 200, rewards: "153 STX" },
+    { rank: 2, username: "StacksBuilder", score: 15420, streak: 45, contributions: 127, contracts: 85, rewards: "98 STX" },
+    { rank: 3, username: "ClarityDev", score: 12850, streak: 38, contributions: 93, contracts: 64, rewards: "82 STX" }
+];
+
+// Export to window for global access (Fallback for legacy components)
+window.connectWallet = connectWallet;
+window.dailyCheckIn = dailyCheckIn;
+window.executeSwap = executeSwap;
+window.createVault = createVault;
+window.stakeInVault = stakeInVault;
+window.claimDistribution = claimDistribution;
+
+// ============================================================
 // HELPERS
 // ============================================================
 
@@ -717,16 +734,24 @@ function attachListeners() {
     if (claimDistributionBtn) claimDistributionBtn.onclick = claimDistribution;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 StacksRank initializing...');
-    console.log('🔍 LeatherProvider available:', !!window.LeatherProvider);
-    console.log('🔍 StacksConnect available:', !!window.StacksConnect);
-    console.log('🔍 Connect available:', !!window.Connect);
-
-    attachListeners();
-    loadLeaderboard();
-    updateStats();
-    loadUserVaults();
-});
+// Auto-initialize
+(function init() {
+    console.log('🚀 StacksRank ESM initializing...');
+    
+    // In ESM, we can attach listeners immediately if the script is deferred/type="module"
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+             attachListeners();
+             loadLeaderboard();
+             updateStats();
+             loadUserVaults();
+        });
+    } else {
+        attachListeners();
+        loadLeaderboard();
+        updateStats();
+        loadUserVaults();
+    }
+})();
 
 console.log('✨ StacksRank app-leather.js loaded!');
