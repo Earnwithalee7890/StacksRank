@@ -21,28 +21,34 @@
 
   <!-- Leather Wallet Integration is handled by src/app-leather.js -->
   
-  <!-- Standard Stacks.js Libraries - Reliable V8 Global Bundles via UNPKG -->
-  <script src="https://unpkg.com/@stacks/network@7.2.0/dist/index.js"></script>
-  <script src="https://unpkg.com/@stacks/transactions@7.3.0/dist/index.js"></script>
-  <script src="https://unpkg.com/@stacks/connect@8.2.3/dist/index.js"></script>
+  <!-- Standard Stacks.js Libraries - Reliable IIFE Global Bundles -->
+  <script src="https://cdn.jsdelivr.net/npm/@stacks/network@6.13.0/dist/index.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@stacks/transactions@6.13.0/dist/index.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@stacks/connect@7.8.2/dist/index.global.js"></script>
   
   <script>
-    // Robust Global Library Mapper
     (function() {
-      function mapStacks() {
+      function syncStacks() {
+        // Ensure the StacksConnect, StacksTransactions, and StacksNetwork are correctly mapped
+        window.StacksConnect = window.StacksConnect || window.Connect;
+        window.StacksTransactions = window.StacksTransactions || window.StacksTx;
+        window.StacksNetwork = window.StacksNetwork || window.StacksNet;
+
+        // Create the modern 'stacks' namespace for consistency with app-leather.js
         window.stacks = window.stacks || {};
-        window.stacks.network = window.stacks.network || window.StacksNetwork;
+        window.stacks.connect = window.stacks.connect || window.StacksConnect;
         window.stacks.transactions = window.stacks.transactions || window.StacksTransactions;
-        window.stacks.connect = window.stacks.connect || window.StacksConnect || window.Connect;
+        window.stacks.network = window.stacks.network || window.StacksNetwork;
         
-        console.log('✅ Stacks Libraries Mapped:', {
-            Connect: !!(window.stacks.connect?.openContractCall || window.StacksConnect?.openContractCall),
-            Network: !!window.stacks.network,
-            Tx: !!window.stacks.transactions
+        console.log('Final Library Mapping Check:', {
+          connect: !!window.stacks.connect?.openContractCall,
+          tx: !!window.stacks.transactions,
+          net: !!window.stacks.network
         });
       }
-      window.addEventListener('load', mapStacks);
-      setTimeout(mapStacks, 1000); // Fail-safe mapping
+      window.addEventListener('DOMContentLoaded', syncStacks);
+      window.addEventListener('load', syncStacks);
+      setInterval(syncStacks, 2000); // Periodic sync to catch delayed loads
     })();
   </script>
 

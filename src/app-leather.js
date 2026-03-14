@@ -172,46 +172,27 @@ function callContract({ contract, functionName, functionArgs = [], onSuccess, on
 
     console.log(`🚀 Calling ${contractAddress}.${contractName}::${functionName}`);
 
-    // SUPER ROBUST DETECTION LOOP
-    let openContractCall = null;
-    const candidates = [
-        window.stacks?.connect,
-        window.StacksConnect,
-        window.Connect,
-        window.StacksConnect?.StacksConnect,
-        window.stacksConnect,
-        window.Stacks?.Connect
-    ];
-
-    for (const c of candidates) {
-        if (c && typeof c.openContractCall === 'function') {
-            openContractCall = c.openContractCall.bind(c);
-            break;
-        }
-    }
+    // DEFINITIVE DETECTION
+    const openContractCall = 
+        window.stacks?.connect?.openContractCall || 
+        window.StacksConnect?.openContractCall || 
+        window.Connect?.openContractCall;
 
     if (!openContractCall) {
-        console.error('❌ Wallet library NOT detected. Diagnostics:', {
+        console.error('❌ Wallet library is STILL not found. Checked:', {
             StacksConnect: !!window.StacksConnect,
             Connect: !!window.Connect,
-            stacks: !!window.stacks,
-            stacks_connect: !!window.stacks?.connect
+            stacks: !!window.stacks
         });
-        showNotification('❌ Wallet library failed to link. Using fallback...', 'warning');
-        
-        // Final attempt fallback: use window.Connect if available in any form
-        openContractCall = window.Connect?.openContractCall || window.StacksConnect?.openContractCall;
-        
-        if (!openContractCall) {
-            showNotification('❌ Critical Error: Wallet library missing. Please reload.', 'error');
-            if (onCancel) onCancel();
-            return;
-        }
+        showNotification('❌ Internal Error: Wallet library failed to load. Please Hard-Refresh (Ctrl+F5).', 'error');
+        if (onCancel) onCancel();
+        return;
     }
 
-    // Get V8 constants from global objects
-    const AnchorMode = window.stacks?.transactions?.AnchorMode || window.StacksTransactions?.AnchorMode || { Any: 0x03 };
-    const PostConditionMode = window.stacks?.transactions?.PostConditionMode || window.StacksTransactions?.PostConditionMode || { Allow: 0x01 };
+    // V6/V7 Constants Extraction
+    const transactions = window.stacks?.transactions || window.StacksTransactions || {};
+    const AnchorModeAny = transactions.AnchorMode?.Any ?? 0x03;
+    const PostConditionModeAllow = transactions.PostConditionMode?.Allow ?? 0x01;
     
     // Get Network
     const network = getNetwork();
@@ -224,8 +205,8 @@ function callContract({ contract, functionName, functionArgs = [], onSuccess, on
             functionArgs,
             network,
             appDetails,
-            anchorMode: AnchorMode.Any,
-            postConditionMode: PostConditionMode.Allow,
+            anchorMode: AnchorModeAny,
+            postConditionMode: PostConditionModeAllow,
             onFinish: (data) => {
                 console.log('✅ Success! Transaction broadcasted.', data);
                 if (onSuccess) onSuccess(data);
@@ -236,8 +217,8 @@ function callContract({ contract, functionName, functionArgs = [], onSuccess, on
             }
         });
     } catch (err) {
-        console.error('❌ Error opening contract call:', err);
-        showNotification('❌ Failsafe: Could not open wallet popup.', 'error');
+        console.error('❌ Error executing openContractCall:', err);
+        showNotification('❌ Failsafe triggered: Could not open wallet popup.', 'error');
         if (onCancel) onCancel();
     }
 }
