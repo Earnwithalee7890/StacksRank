@@ -1,4 +1,4 @@
-# 📋 Documentation Update Summary - Stacks Builder Rewards Integration
+# 📋 Documentation Update Summary - Stacks Builder Rewards 2026 Integration
 
 ## ✅ All Documentation Updated!
 

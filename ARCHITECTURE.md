@@ -103,5 +103,5 @@ sequenceDiagram
 
 ---
 
-**Built for Talent Protocol Stacks Event 2026** 🚀  
+**Built for Talent Protocol Stacks Event March 2026** 🚀  
 *Advancing the Stacks ecosystem through modular, secure, and verifiable code.*
