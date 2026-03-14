@@ -75,14 +75,17 @@ function showNotification(message, type = 'info') {
 function getNetwork() {
     if (stacksNetwork) return stacksNetwork;
     
-    // V8 Network detection
+    // Robust Network detection
     const StacksMainnet = 
         window.stacks?.network?.StacksMainnet || 
         window.StacksNetwork?.StacksMainnet || 
-        window.StacksMainnet;
+        window.StacksMainnet ||
+        window.Stacks?.Network?.StacksMainnet;
         
     if (StacksMainnet) {
         stacksNetwork = new StacksMainnet();
+    } else {
+        console.warn('⚠️ Could not find StacksMainnet class, defaulting to mock-like behavior');
     }
     return stacksNetwork;
 }
@@ -169,19 +172,23 @@ function callContract({ contract, functionName, functionArgs = [], onSuccess, on
 
     console.log(`🚀 Calling ${contractAddress}.${contractName}::${functionName}`);
 
-    // V8 SPECIFIC DETECTION (Matching your working "stx-daily-check-in-hiro" repo)
+    // ROBUST SPECIFIC DETECTION
     const openContractCall = 
         window.stacks?.connect?.openContractCall || 
         window.StacksConnect?.openContractCall ||
-        window.Connect?.openContractCall;
+        window.Connect?.openContractCall ||
+        window.Stacks?.Connect?.openContractCall ||
+        window.stacksConnect?.openContractCall;
 
     if (!openContractCall) {
-        console.error('❌ Wallet library NOT detected. Globals:', {
+        console.error('❌ Wallet library NOT detected. Checked globals:', {
             stacks: !!window.stacks,
             stacks_connect: !!window.stacks?.connect,
-            StacksConnect: !!window.StacksConnect
+            StacksConnect: !!window.StacksConnect,
+            Connect: !!window.Connect,
+            Stacks: !!window.Stacks
         });
-        showNotification('❌ Wallet library failed to load. Please Hard-Refresh.', 'error');
+        showNotification('❌ Wallet library missing. Please wait 2s and try again.', 'error');
         if (onCancel) onCancel();
         return;
     }
