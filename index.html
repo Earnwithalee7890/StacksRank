@@ -22,6 +22,21 @@
   <!-- Leather Wallet Integration is handled by src/app-leather.js -->
   
   <!-- Standard Stacks.js Libraries are now imported directly in app-leather.js as modules -->
+  <script>
+    // Defensive Wallet Conflict Resolution
+    (function() {
+      const originalDefineProperty = Object.defineProperty;
+      Object.defineProperty = function(obj, prop, descriptor) {
+        if (prop === 'StacksProvider' || prop === 'ethereum') {
+          if (obj[prop] !== undefined) {
+            console.warn(`🛡️ Protected ${prop} from being redefined by another extension.`);
+            return obj;
+          }
+        }
+        return originalDefineProperty.apply(this, arguments);
+      };
+    })();
+  </script>
 
   <link rel="stylesheet" href="src/styles/globals.css">
 </head>

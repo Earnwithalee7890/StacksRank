@@ -1,8 +1,7 @@
-// StacksRank - Leather Wallet Integration (v1.2.0 - ESM Module Build)
-import { openContractCall, showConnect, authenticate } from 'https://cdn.jsdelivr.net/npm/@stacks/connect@8.2.3/+esm';
-import { StacksMainnet } from 'https://cdn.jsdelivr.net/npm/@stacks/network@7.2.0/+esm';
-import { AnchorMode, PostConditionMode, stringAsciiCV } from 'https://cdn.jsdelivr.net/npm/@stacks/transactions@7.3.0/+esm';
-import { AppConfig, UserSession } from 'https://cdn.jsdelivr.net/npm/@stacks/connect@8.2.3/+esm';
+// StacksRank - Leather Wallet Integration (v1.2.1 - ESM Module Build)
+import { openContractCall, showConnect, authenticate, AppConfig, UserSession } from 'https://esm.sh/@stacks/connect@8.2.2';
+import { StacksMainnet } from 'https://esm.sh/@stacks/network@7.2.0';
+import { AnchorMode, PostConditionMode, stringAsciiCV } from 'https://esm.sh/@stacks/transactions@7.3.0';
 
 // ============================================================
 // CONFIG
@@ -124,7 +123,7 @@ function updateWalletUI(address) {
 // CORE CONTRACT CALL
 // ============================================================
 
-function callContract({ contract, functionName, functionArgs = [], onSuccess, onCancel }) {
+function callContract({ contract, functionName, functionArgs = [], onSuccess, onCancel, onError }) {
     if (!connectedAddress) {
         showNotification('⚠️ Please connect your wallet first!', 'warning');
         connectWallet();
@@ -159,8 +158,8 @@ function callContract({ contract, functionName, functionArgs = [], onSuccess, on
         });
     } catch (err) {
         console.error('❌ Error executing openContractCall:', err);
-        showNotification('❌ Critical Error: Could not open wallet popup.', 'error');
-        if (onCancel) onCancel();
+        showNotification('❌ Transaction Error: ' + err.message, 'error');
+        if (onError) onError(err);
     }
 }
 
@@ -199,6 +198,12 @@ async function dailyCheckIn() {
         onCancel: () => {
             clearTimeout(btnTimeout);
             showNotification('⚠️ Check-in cancelled', 'warning');
+            if (btn) { btn.disabled = false; btn.textContent = '✅ Daily Check-in'; }
+        },
+        onError: (err) => {
+            clearTimeout(btnTimeout);
+            console.error('Check-in error:', err);
+            showNotification('❌ Check-in failed: ' + (err.message || 'Unknown error'), 'error');
             if (btn) { btn.disabled = false; btn.textContent = '✅ Daily Check-in'; }
         }
     });
