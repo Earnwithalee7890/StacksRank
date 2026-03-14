@@ -8,6 +8,8 @@
 [**🔴 Live Demo**](https://stacks-rank.vercel.app/)
 
 [![Stacks](https://img.shields.io/badge/Stacks-Clarity%203%20%26%204-5546FF?style=for-the-badge&logo=stacks)](https://stacks.co)
+[![npm version](https://img.shields.io/npm/v/stacksrank-sdk?style=for-the-badge&color=orange)](https://www.npmjs.com/package/stacksrank-sdk)
+[![npm downloads](https://img.shields.io/npm/dm/stacksrank-sdk?style=for-the-badge&color=blue)](https://www.npmjs.com/package/stacksrank-sdk)
 [![Reward Pool](https://img.shields.io/badge/Reward%20Pool-15%2C300%20STX-success?style=for-the-badge&logo=bitcoin)](https://talentprotocol.com)
 [![Event](https://img.shields.io/badge/Event-Talent%20Protocol-purple?style=for-the-badge)](https://talentprotocol.com)
 
