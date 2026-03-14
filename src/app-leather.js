@@ -75,10 +75,13 @@ function showNotification(message, type = 'info') {
 function getNetwork() {
     if (stacksNetwork) return stacksNetwork;
     // Use StacksNetwork from @stacks/network CDN
-    if (window.StacksNetwork && window.StacksNetwork.StacksMainnet) {
-        stacksNetwork = new window.StacksNetwork.StacksMainnet();
-    } else if (window.StacksMainnet) {
-        stacksNetwork = new window.StacksMainnet();
+    // v7+ often uses StacksNetwork as the global
+    const NetworkClass = 
+        window.StacksNetwork?.StacksMainnet || 
+        window.StacksMainnet;
+        
+    if (NetworkClass) {
+        stacksNetwork = new NetworkClass();
     }
     return stacksNetwork;
 }
@@ -165,11 +168,19 @@ function callContract({ contract, functionName, functionArgs = [], onSuccess, on
 
     console.log(`🚀 Calling ${contractAddress}.${contractName}::${functionName}`);
 
-    // Standard detection for @stacks/connect UMD
+    // Standard detection for @stacks/connect UMD (v7/v8)
     const openContractCall = 
         window.StacksConnect?.openContractCall || 
         window.stacksConnect?.openContractCall ||
-        window.Connect?.openContractCall;
+        window.Connect?.openContractCall ||
+        // Sometimes exposed directly if the build is different
+        (typeof openContractCall === 'function' ? openContractCall : null);
+
+    console.log('🔍 Global check:', {
+        StacksConnect: !!window.StacksConnect,
+        Connect: !!window.Connect,
+        openContractCall: !!openContractCall
+    });
 
     if (!openContractCall) {
         console.error('❌ StacksConnect library not detected on page.');
