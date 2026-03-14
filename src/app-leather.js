@@ -1,6 +1,7 @@
-// StacksRank - Leather Wallet Integration (v1.0.1 - Fresh Build)
-// Uses @stacks/connect openContractCall for wallet popups (the standard proven approach).
-// Uses window.LeatherProvider ONLY for address fetching.
+// StacksRank - Leather Wallet Integration (v1.1.0 - ESM Module Build)
+import { openContractCall } from 'https://cdn.jsdelivr.net/npm/@stacks/connect@8.2.3/+esm';
+import { StacksMainnet } from 'https://cdn.jsdelivr.net/npm/@stacks/network@7.2.0/+esm';
+import { AnchorMode, PostConditionMode, stringAsciiCV } from 'https://cdn.jsdelivr.net/npm/@stacks/transactions@7.3.0/+esm';
 
 // ============================================================
 // CONFIG
@@ -21,22 +22,9 @@ const appDetails = {
     icon: window.location.origin + '/logo.png',
 };
 
-// StacksMainnet object from CDN
-let stacksNetwork = null;
-
-// ============================================================
-// STATE
-// ============================================================
+// State
 let connectedAddress = null;
-
-// ============================================================
-// LEADERBOARD DATA
-// ============================================================
-const mockLeaderboardData = [
-    { rank: 1, username: "Aleekhoso 🔵 🟣", score: 28300, streak: 12, contributions: 283, contracts: 200, rewards: "153 STX" },
-    { rank: 2, username: "StacksBuilder", score: 15420, streak: 45, contributions: 127, contracts: 85, rewards: "98 STX" },
-    { rank: 3, username: "ClarityDev", score: 12850, streak: 38, contributions: 93, contracts: 64, rewards: "82 STX" }
-];
+let stacksNetwork = new StacksMainnet();
 
 // ============================================================
 // HELPERS
@@ -73,20 +61,6 @@ function showNotification(message, type = 'info') {
 // NETWORK SETUP
 // ============================================================
 function getNetwork() {
-    if (stacksNetwork) return stacksNetwork;
-    
-    // Robust Network detection
-    const StacksMainnet = 
-        window.stacks?.network?.StacksMainnet || 
-        window.StacksNetwork?.StacksMainnet || 
-        window.StacksMainnet ||
-        window.Stacks?.Network?.StacksMainnet;
-        
-    if (StacksMainnet) {
-        stacksNetwork = new StacksMainnet();
-    } else {
-        console.warn('⚠️ Could not find StacksMainnet class, defaulting to mock-like behavior');
-    }
     return stacksNetwork;
 }
 
@@ -154,8 +128,7 @@ function updateWalletUI(address) {
 }
 
 // ============================================================
-// CORE CONTRACT CALL — Uses standard openContractCall
-// This is the most reliable way to trigger the wallet popup.
+// CORE CONTRACT CALL
 // ============================================================
 
 function callContract({ contract, functionName, functionArgs = [], onSuccess, onCancel }) {
@@ -172,43 +145,16 @@ function callContract({ contract, functionName, functionArgs = [], onSuccess, on
 
     console.log(`🚀 Calling ${contractAddress}.${contractName}::${functionName}`);
 
-    // DEFINITIVE DETECTION (Via ESM Bridge)
-    const openContractCall = 
-        window.stacks?.connect?.openContractCall || 
-        window.StacksConnect?.openContractCall;
-
-    if (!openContractCall) {
-        console.warn('⚠️ Stacks libraries not ready yet, waiting...');
-        showNotification('⏳ Initializing wallet connection...', 'info');
-        // If not found immediately, we can wait or tell the user to try again in 1s
-        setTimeout(() => {
-             if (window.stacks?.connect?.openContractCall) {
-                 showNotification('✅ Connection ready!', 'success');
-             }
-        }, 1000);
-        
-        if (onCancel) onCancel();
-        return;
-    }
-
-    // V6/V7 Constants Extraction
-    const transactions = window.stacks?.transactions || window.StacksTransactions || {};
-    const AnchorModeAny = transactions.AnchorMode?.Any ?? 0x03;
-    const PostConditionModeAllow = transactions.PostConditionMode?.Allow ?? 0x01;
-    
-    // Get Network
-    const network = getNetwork();
-
     try {
         openContractCall({
             contractAddress,
             contractName,
             functionName,
             functionArgs,
-            network,
+            network: stacksNetwork,
             appDetails,
-            anchorMode: AnchorModeAny,
-            postConditionMode: PostConditionModeAllow,
+            anchorMode: AnchorMode.Any,
+            postConditionMode: PostConditionMode.Allow,
             onFinish: (data) => {
                 console.log('✅ Success! Transaction broadcasted.', data);
                 if (onSuccess) onSuccess(data);
@@ -220,7 +166,7 @@ function callContract({ contract, functionName, functionArgs = [], onSuccess, on
         });
     } catch (err) {
         console.error('❌ Error executing openContractCall:', err);
-        showNotification('❌ Failsafe triggered: Could not open wallet popup.', 'error');
+        showNotification('❌ Critical Error: Could not open wallet popup.', 'error');
         if (onCancel) onCancel();
     }
 }

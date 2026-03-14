@@ -21,29 +21,7 @@
 
   <!-- Leather Wallet Integration is handled by src/app-leather.js -->
   
-  <!-- Standard Stacks.js Libraries - Reliable ESM-to-Global Bridge -->
-  <script type="module">
-    import { openContractCall } from 'https://cdn.jsdelivr.net/npm/@stacks/connect@8.2.3/+esm';
-    import { StacksMainnet } from 'https://cdn.jsdelivr.net/npm/@stacks/network@7.2.0/+esm';
-    import { AnchorMode, PostConditionMode, stringAsciiCV } from 'https://cdn.jsdelivr.net/npm/@stacks/transactions@7.3.0/+esm';
-
-    // Bridge ESM functions to the global window object for app-leather.js
-    window.StacksConnect = { openContractCall };
-    window.StacksNetwork = { StacksMainnet };
-    window.StacksTransactions = { AnchorMode, PostConditionMode, stringAsciiCV };
-    
-    // Unified 'stacks' namespace
-    window.stacks = {
-      connect: { openContractCall },
-      network: { StacksMainnet },
-      transactions: { AnchorMode, PostConditionMode, stringAsciiCV }
-    };
-    
-    console.log('🚀 Stacks.js Libraries (V8) Loaded via ESM Bridge');
-    
-    // Dispatch a custom event so the app knows we are ready
-    window.dispatchEvent(new CustomEvent('stacks-libraries-ready'));
-  </script>
+  <!-- Standard Stacks.js Libraries are now imported directly in app-leather.js as modules -->
 
   <link rel="stylesheet" href="src/styles/globals.css">
 </head>
@@ -499,7 +477,8 @@
     </div>
   </footer>
 
-  <script src="src/app-leather.js" defer></script>
+  <!-- Standard App Logic - Loaded as Module to support direct imports -->
+  <script src="src/app-leather.js" type="module"></script>
 </body>
 
 </html>
