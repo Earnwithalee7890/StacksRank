@@ -3,7 +3,7 @@
 ![StacksRank Header](https://raw.githubusercontent.com/Earnwithalee7890/StacksRank/main/public/header.png)
 
 > **Build, Compete, and Earn on Bitcoin L2.**  
-> StacksRank is the premier reputation tracking and DeFi orchestration platform built exclusively for the **Stacks Builder Rewards (Jan 2026)** campaign by Talent Protocol.
+> StacksRank is the premier reputation tracking and DeFi orchestration platform built exclusively for the **Stacks Builder Rewards (March 2026)** campaign by Talent Protocol.
 
 [**🔴 Live Demo**](https://stacks-rank.vercel.app/)
 
@@ -17,7 +17,7 @@
 
 ## 🚀 About The Project
 
-**StacksRank** is engineered to be the ultimate companion for the **Stacks Builder Rewards** campaign (Jan 19-31). 
+**StacksRank** is engineered to be the ultimate companion for the **Stacks Builder Rewards** campaign (March 1-31). 
 
 With a total prize pool of **15,300 STX** distributed to high-impact developers, StacksRank serves as both a demonstration of technical excellence and a tool for builders to track their standing.
 
