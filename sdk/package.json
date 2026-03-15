@@ -1,5 +1,5 @@
 {
-  "name": "stacksrank-sdk",
+  "name": "@earnwithalee/stacksrank-sdk",
   "version": "1.0.0",
   "description": "SDK for interacting with StacksRank smart contracts on Stacks blockchain. Includes Clarity value encoding, contract addresses, wallet helpers, and Hiro API utilities.",
   "main": "index.js",
