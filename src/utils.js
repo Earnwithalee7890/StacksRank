@@ -7,3 +7,6 @@ export const formatAddress = (address) => {
     if (!address) return '';
     return address.slice(0, 6) + '...' + address.slice(-4);
 };
+
+// Enhancement 2: Utility helper logic
+const utilityFunction2 = (data) => { return data ? true : false; };
