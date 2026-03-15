@@ -3,13 +3,13 @@
 ![StacksRank Header](https://raw.githubusercontent.com/Earnwithalee7890/StacksRank/main/public/header.png)
 
 > **Build, Compete, and Earn on Bitcoin L2.**  
-> StacksRank is a premier reputation tracking and DeFi orchestration platform built exclusively for the **Stacks Builder Rewards** campaign.
+> StacksRank is the premier reputation tracking and DeFi orchestration platform built exclusively for the **Stacks Builder Rewards (March 2026)** campaign by Talent Protocol.
 
 [**🔴 Live Demo**](https://stacks-rank.vercel.app/)
 
 [![Stacks](https://img.shields.io/badge/Stacks-Clarity%203%20%26%204-5546FF?style=for-the-badge&logo=stacks)](https://stacks.co)
-[![npm version](https://img.shields.io/npm/v/@earnwithalee/stacksrank-sdk?style=for-the-badge&color=orange)](https://www.npmjs.com/package/@earnwithalee/stacksrank-sdk)
-[![npm downloads](https://img.shields.io/npm/dm/@earnwithalee/stacksrank-sdk?style=for-the-badge&color=blue)](https://www.npmjs.com/package/@earnwithalee/stacksrank-sdk)
+[![npm version](https://img.shields.io/npm/v/stacksrank-sdk?style=for-the-badge&color=orange)](https://www.npmjs.com/package/stacksrank-sdk)
+[![npm downloads](https://img.shields.io/npm/dm/stacksrank-sdk?style=for-the-badge&color=blue)](https://www.npmjs.com/package/stacksrank-sdk)
 [![Reward Pool](https://img.shields.io/badge/Reward%20Pool-15%2C300%20STX-success?style=for-the-badge&logo=bitcoin)](https://talentprotocol.com)
 [![Event](https://img.shields.io/badge/Event-Talent%20Protocol-purple?style=for-the-badge)](https://talentprotocol.com)
 
@@ -17,7 +17,7 @@
 
 ## 🚀 About The Project
 
-**StacksRank** is engineered to be the ultimate companion for the **Stacks Builder Rewards** campaign (Jan 19-31). 
+**StacksRank** is engineered to be the ultimate companion for the **Stacks Builder Rewards** campaign (March 1-31). 
 
 With a total prize pool of **15,300 STX** distributed to high-impact developers, StacksRank serves as both a demonstration of technical excellence and a tool for builders to track their standing.
 
@@ -48,7 +48,7 @@ This project is meticulously crafted to maximize the **tier-ranking criteria** d
 
 We've launched an easy-to-use SDK for developers who want to integrate StacksRank data or Clarity utilities into their own apps.
 
-**`npm install @earnwithalee/stacksrank-sdk`**
+**`npm install stacksrank-sdk`**
 
 - **Clarity Encoding**: Pure JS encoding for all Clarity types.
 - **Contract Registry**: Programmatic access to all StacksRank contract addresses.
