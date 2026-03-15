@@ -13,13 +13,13 @@ Official SDK for interacting with [StacksRank](https://github.com/Earnwithalee78
 ## Installation
 
 ```bash
-npm install stacksrank-sdk
+npm install @earnwithalee/stacksrank-sdk
 ```
 
 ## Quick Start
 
 ```javascript
-const { encoding, contracts, api } = require('stacksrank-sdk');
+const { encoding, contracts, api } = require('@earnwithalee/stacksrank-sdk');
 
 // Encode Clarity values
 const name = encoding.encodeStringAscii("MyBuilder");
