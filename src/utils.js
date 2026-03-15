@@ -1,12 +1,4 @@
-/**
- * Format a Stacks address for display.
- * @param {string} address
- * @returns {string}
- */
-export const formatAddress = (address) => {
-    if (!address) return '';
-    return address.slice(0, 6) + '...' + address.slice(-4);
-};
+/** * Format a Stacks address for display. * @param {string} address * @returns {string} */ export const formatAddress = (address) => { if (!address) return ''; return address.slice(0, 6) + '...' + address.slice(-4); };  // Enhancement 2: Utility helper logic const utilityFunction2 = (data) => { return data ? true : false; }; 
 
-// format relative timestamps for display
-export const formatTimestamp = (data) => { return data ? JSON.parse(JSON.stringify(data)) : null; };
+ // format relative timestamps for display
+export const formatTimestamp = (data) => { return data ? JSON.parse(JSON.stringify(data)) : null; }; 
