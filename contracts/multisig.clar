@@ -50,3 +50,5 @@
 (define-read-only (get-status)
   (ok { amount: (var-get withdraw-amount), approved-1: (var-get approval-1), approved-2: (var-get approval-2) })
 )
+
+(asserts! (< block-height (get expires proposal)) (err u700))
