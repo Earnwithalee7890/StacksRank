@@ -38,3 +38,5 @@
 (define-read-only (get-status)
   (ok { last-checkin: (var-get last-checkin), beneficiary: (var-get beneficiary), timeout: TIMEOUT })
 )
+
+(define-data-var grace-period uint u1008)
