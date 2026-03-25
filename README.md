@@ -130,3 +130,8 @@ Distributed under the MIT License. See `LICENSE` for more information.
 <p align="center">
   Built with ❤️ for the <strong>Stacks Builder Community</strong> by Earnwithalee7890
 </p>
+
+![Clarity](https://img.shields.io/badge/Clarity-2.0-purple)
+![Mainnet](https://img.shields.io/badge/Network-Stacks_Mainnet-blue)
+![Verified](https://img.shields.io/badge/Contracts-Verified-green)
+
