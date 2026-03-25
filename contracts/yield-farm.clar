@@ -305,3 +305,5 @@
   (var-set total-stakers u0)
   (var-set total-rewards-paid u0)
 )
+
+(define-private (calculate-reward (time uint)) (* time u10))
