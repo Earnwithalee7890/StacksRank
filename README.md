@@ -30,7 +30,6 @@ This project is meticulously crafted to maximize the **tier-ranking criteria** d
 4.  **✅ Bitcoin L2 Wallet Support**: Native support for **Leather**, **Xverse**, and **Asigna** via direct provider injection.
 
 ---
-
 ## 💎 Core Features
 
 1.  **🏆 Dynamic Reputation Leaderboard**:  
