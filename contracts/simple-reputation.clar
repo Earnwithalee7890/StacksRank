@@ -186,3 +186,5 @@
 
 (define-constant ERR-NOT-AUTHORIZED (err u100))
 (define-constant ERR-ALREADY-EXISTS (err u101))
+
+;; OPTIMIZATION: Cache base score in local variable
