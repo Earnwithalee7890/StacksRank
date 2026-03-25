@@ -105,3 +105,6 @@ sequenceDiagram
 
 **Built for Talent Protocol Stacks Event March 2026** 🚀  
 *Advancing the Stacks ecosystem through modular, secure, and verifiable code.*
+
+## Component Interaction
+Users interact via Stacks.js to signed transactions targeting the Reputation and Swap contracts.
