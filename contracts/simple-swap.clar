@@ -175,3 +175,5 @@
 (define-private (is-owner) (is-eq tx-sender (var-get contract-owner)))
 
 (print { event: "swap-executed", caller: tx-sender })
+
+;; @desc Handles atomic STX swaps with zero slippage
