@@ -86,3 +86,6 @@
     (ok (map-set minters minter false))
   )
 )
+
+;; Implements SIP-010-trait
+(define-read-only (get-total-supply) (ok (ft-get-supply stacksrank-token)))
