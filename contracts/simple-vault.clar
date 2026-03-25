@@ -207,3 +207,5 @@
   (var-set vault-counter u0)
   (var-set proposal-counter u0)
 )
+
+(define-read-only (get-vault-balance) (stx-get-balance (as-contract tx-sender)))
