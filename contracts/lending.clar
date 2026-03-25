@@ -330,3 +330,6 @@
   (var-set total-loans-opened u0)
   (var-set total-liquidations u0)
 )
+
+(define-constant BASIS-POINTS u10000)
+(define-constant ANNUAL-RATE u800)
