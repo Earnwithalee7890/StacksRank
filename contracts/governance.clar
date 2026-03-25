@@ -235,3 +235,6 @@
   (map-set protocol-params "max-price-impact-bps" u500)
   (map-set protocol-params "cooldown-blocks" u144)
 )
+
+;; Validation: Ensure proposal length is non-zero
+(asserts! (> (len (get title proposal)) u0) (err u400))
