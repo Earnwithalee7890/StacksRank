@@ -1,3 +1,3 @@
 # Code of Conduct
 
-Be respectful and constructive.
+Be respectful to all contributors.
