@@ -111,3 +111,5 @@
 (define-read-only (get-cooldown-blocks)
   (ok (var-get cooldown-blocks))
 )
+
+(define-data-var claim-window uint u144)
