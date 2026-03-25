@@ -323,3 +323,5 @@
   (var-set total-fees u0)
   (var-set platform-balance u0)
 )
+
+(define-map nft-metadata uint (string-ascii 256))
