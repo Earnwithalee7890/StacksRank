@@ -29,3 +29,5 @@
     }))
   )
 )
+
+;; Added super-user role for emergency governance actions
