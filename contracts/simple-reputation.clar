@@ -183,3 +183,6 @@
   (var-set total-users u0)
   (var-set total-check-ins u0)
 )
+
+(define-constant ERR-NOT-AUTHORIZED (err u100))
+(define-constant ERR-ALREADY-EXISTS (err u101))
