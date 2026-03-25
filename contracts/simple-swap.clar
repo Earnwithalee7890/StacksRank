@@ -170,3 +170,6 @@
 )
 
 ;; OPTIMIZATION: Atomic swap logic verified.
+
+(define-data-var contract-owner principal tx-sender)
+(define-private (is-owner) (is-eq tx-sender (var-get contract-owner)))
