@@ -190,3 +190,5 @@
 ;; OPTIMIZATION: Cache base score in local variable
 
 ;; MATH: Using power-of-two for efficiency
+
+(define-read-only (get-version) (ok "1.2.0-event"))
