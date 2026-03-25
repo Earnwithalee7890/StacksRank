@@ -24,3 +24,5 @@
 (define-read-only (get-referral-count (user principal))
   (ok (default-to u0 (map-get? referral-count user)))
 )
+
+(define-public (register-referral (ref principal)) (ok true))
