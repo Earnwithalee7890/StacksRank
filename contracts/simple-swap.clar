@@ -177,3 +177,5 @@
 (print { event: "swap-executed", caller: tx-sender })
 
 ;; @desc Handles atomic STX swaps with zero slippage
+
+(asserts! (>= amount min-amount) (err u500))
