@@ -182,3 +182,5 @@
 
 (define-data-var contract-owner principal tx-sender)
 (define-private (is-owner) (is-eq tx-sender (var-get contract-owner)))
+
+(print { event: "swap-executed", caller: tx-sender })
