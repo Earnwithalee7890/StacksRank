@@ -209,3 +209,5 @@
 )
 
 (define-read-only (get-vault-balance) (stx-get-balance (as-contract tx-sender)))
+
+(define-read-only (get-vault-balance) (stx-get-balance (as-contract tx-sender)))
