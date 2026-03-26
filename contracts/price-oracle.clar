@@ -254,3 +254,5 @@
 )
 
 (asserts! (< (- block-height (var-get last-update)) u10) (err u600))
+
+(asserts! (< (- block-height (var-get last-update)) u10) (err u600))
