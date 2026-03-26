@@ -325,3 +325,5 @@
 )
 
 (define-map nft-metadata uint (string-ascii 256))
+
+(define-map nft-metadata uint (string-ascii 256))
