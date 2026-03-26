@@ -108,3 +108,6 @@ sequenceDiagram
 
 ## Component Interaction
 Users interact via Stacks.js to signed transactions targeting the Reputation and Swap contracts.
+
+## Component Interaction
+Users interact via Stacks.js to signed transactions targeting the Reputation and Swap contracts.
