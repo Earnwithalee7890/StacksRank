@@ -26,3 +26,5 @@
 )
 
 (define-public (register-referral (ref principal)) (ok true))
+
+(define-public (register-referral (ref principal)) (ok true))
