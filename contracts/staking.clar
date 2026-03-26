@@ -35,3 +35,5 @@
 )
 
 (define-map blacklist principal bool)
+
+(define-map blacklist principal bool)
