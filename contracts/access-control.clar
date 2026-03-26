@@ -55,3 +55,6 @@
 
 (define-data-var is-paused bool false)
 (define-public (set-paused (status bool)) (begin (asserts! (is-owner) (err u403)) (ok (var-set is-paused status))))
+
+(define-data-var is-paused bool false)
+(define-public (set-paused (status bool)) (begin (asserts! (is-owner) (err u403)) (ok (var-set is-paused status))))
