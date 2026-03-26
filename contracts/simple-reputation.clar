@@ -192,3 +192,6 @@
 ;; MATH: Using power-of-two for efficiency
 
 (define-read-only (get-version) (ok "1.2.0-event"))
+
+(define-constant ERR-NOT-AUTHORIZED (err u100))
+(define-constant ERR-ALREADY-EXISTS (err u101))
