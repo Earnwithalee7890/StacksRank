@@ -20,3 +20,8 @@ pids
 target/
 *.log
 
+
+# Clarinet
+target/
+*.log
+
