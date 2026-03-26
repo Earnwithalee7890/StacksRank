@@ -1,5 +1,5 @@
 {
-  "name": "stacksrank",
+  "name": "@earnwithalee/stacksrank-sdk",
   "version": "1.0.0",
   "description": "StacksRank - Leaderboard, Swap & Vault Platform for Stacks Ecosystem",
   "main": "index.js",
