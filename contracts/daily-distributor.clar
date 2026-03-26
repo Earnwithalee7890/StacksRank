@@ -113,3 +113,5 @@
 )
 
 (define-data-var claim-window uint u144)
+
+(define-data-var claim-window uint u144)
