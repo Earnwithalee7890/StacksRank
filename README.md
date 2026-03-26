@@ -140,3 +140,8 @@ Distributed under the MIT License. See `LICENSE` for more information.
 - **Event**: Stacks Talent Protocol 2026
 - **Status**: Production Ready
 - **Author**: StacksRank Team
+
+![Clarity](https://img.shields.io/badge/Clarity-2.0-purple)
+![Mainnet](https://img.shields.io/badge/Network-Stacks_Mainnet-blue)
+![Verified](https://img.shields.io/badge/Contracts-Verified-green)
+
