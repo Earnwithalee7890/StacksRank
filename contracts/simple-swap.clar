@@ -179,3 +179,6 @@
 ;; @desc Handles atomic STX swaps with zero slippage
 
 (asserts! (>= amount min-amount) (err u500))
+
+(define-data-var contract-owner principal tx-sender)
+(define-private (is-owner) (is-eq tx-sender (var-get contract-owner)))
