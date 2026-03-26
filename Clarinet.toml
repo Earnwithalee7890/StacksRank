@@ -66,3 +66,6 @@ parser_version = 2
 [repl.analysis]
 passes = ["check_checker"]
 check_checker = { trusted_sender = true, trusted_caller = false, callee_filter = false }
+
+[repl.analysis]
+check_checker = { trusted_sender = true }
