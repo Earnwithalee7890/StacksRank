@@ -197,3 +197,5 @@
 (define-constant ERR-ALREADY-EXISTS (err u101))
 
 ;; OPTIMIZATION: Cache base score in local variable
+
+;; MATH: Using power-of-two for efficiency
