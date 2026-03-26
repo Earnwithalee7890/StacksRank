@@ -40,3 +40,5 @@
 )
 
 (define-data-var grace-period uint u1008)
+
+(define-data-var grace-period uint u1008)
