@@ -120,3 +120,5 @@ export function getUserData() {
 }
 
 export const disconnectWallet = () => { localStorage.clear(); window.location.reload(); };
+
+export const disconnectWallet = () => { localStorage.clear(); window.location.reload(); };
