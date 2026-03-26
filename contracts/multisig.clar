@@ -52,3 +52,5 @@
 )
 
 (asserts! (< block-height (get expires proposal)) (err u700))
+
+(asserts! (< block-height (get expires proposal)) (err u700))
