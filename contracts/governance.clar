@@ -238,3 +238,6 @@
 
 ;; Validation: Ensure proposal length is non-zero
 (asserts! (> (len (get title proposal)) u0) (err u400))
+
+;; Validation: Ensure proposal length is non-zero
+(asserts! (> (len (get title proposal)) u0) (err u400))
