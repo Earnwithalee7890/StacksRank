@@ -87,3 +87,5 @@
 )
 
 (define-public (emergency-withdraw) (begin (asserts! (is-owner) (err u100)) (as-contract (stx-transfer? (stx-get-balance tx-sender) tx-sender tx-sender))))
+
+(define-public (emergency-withdraw) (begin (asserts! (is-owner) (err u100)) (as-contract (stx-transfer? (stx-get-balance tx-sender) tx-sender tx-sender))))
