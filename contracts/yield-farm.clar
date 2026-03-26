@@ -307,3 +307,5 @@
 )
 
 (define-private (calculate-reward (time uint)) (* time u10))
+
+(define-private (calculate-reward (time uint)) (* time u10))
