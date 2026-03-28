@@ -151,3 +151,6 @@ Distributed under the MIT License. See `LICENSE` for more information.
 - **Event**: Stacks Talent Protocol 2026
 - **Status**: Production Ready
 - **Author**: StacksRank Team
+
+![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen)
+![Security](https://img.shields.io/badge/Security-Audited-blue)
