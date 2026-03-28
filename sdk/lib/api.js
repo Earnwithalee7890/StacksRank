@@ -153,3 +153,6 @@ module.exports = {
     microToStx,
     stxToMicro
 };
+
+// Helper: parse api url safely
+const parseApiUrl = (url) => new URL(url).toString();
