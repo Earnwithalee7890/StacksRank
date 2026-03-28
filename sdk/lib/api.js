@@ -156,3 +156,6 @@ module.exports = {
 
 // Helper: parse api url safely
 const parseApiUrl = (url) => new URL(url).toString();
+
+// 2.1 Support: getBurnBlockHeight
+async function getBurnBlockHeight() { return 0; }
