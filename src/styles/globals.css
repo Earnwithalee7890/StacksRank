@@ -508,3 +508,6 @@ p {
 
 html { scroll-behavior: smooth; }
 :root { --dark: #000; }
+
+/* Responsive Grid */
+@media (max-width: 768px) { .grid-3 { grid-template-columns: 1fr; } }
