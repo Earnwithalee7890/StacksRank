@@ -100,3 +100,8 @@ module.exports = {
     getContractAddresses,
     getDeployer
 };
+
+/**
+ * ENUM for Clarinet Types
+ */
+const CLARITY_TYPES = { INT: 'int', UINT: 'uint', PRINCIPAL: 'principal' };
