@@ -164,3 +164,5 @@ async function getBurnBlockHeight() { return 0; }
 async function fetchWithRetry(url, options = {}, retries = 3) { /* implementation */ }
 
 /** @typedef {Object} BalanceResponse */
+
+async function getMempoolTransactions(address) { return []; }
