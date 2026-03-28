@@ -159,3 +159,6 @@ const parseApiUrl = (url) => new URL(url).toString();
 
 // 2.1 Support: getBurnBlockHeight
 async function getBurnBlockHeight() { return 0; }
+
+// Retry helper
+async function fetchWithRetry(url, options = {}, retries = 3) { /* implementation */ }
