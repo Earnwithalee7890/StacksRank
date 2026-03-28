@@ -133,24 +133,10 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ![Clarity](https://img.shields.io/badge/Clarity-2.0-purple)
 ![Mainnet](https://img.shields.io/badge/Network-Stacks_Mainnet-blue)
 ![Verified](https://img.shields.io/badge/Contracts-Verified-green)
-
-
-
-## Submission Metadata
-- **Event**: Stacks Talent Protocol 2026
-- **Status**: Production Ready
-- **Author**: StacksRank Team
-
-![Clarity](https://img.shields.io/badge/Clarity-2.0-purple)
-![Mainnet](https://img.shields.io/badge/Network-Stacks_Mainnet-blue)
-![Verified](https://img.shields.io/badge/Contracts-Verified-green)
-
-
-
-## Submission Metadata
-- **Event**: Stacks Talent Protocol 2026
-- **Status**: Production Ready
-- **Author**: StacksRank Team
-
 ![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen)
 ![Security](https://img.shields.io/badge/Security-Audited-blue)
+
+## 🏆 Submission Metadata
+- **Event**: Stacks Talent Protocol 2026
+- **Status**: Production Ready (Audited & Tested)
+- **Author**: StacksRank Team

@@ -170,21 +170,3 @@
 )
 
 ;; OPTIMIZATION: Atomic swap logic verified.
-
-(define-data-var contract-owner principal tx-sender)
-(define-private (is-owner) (is-eq tx-sender (var-get contract-owner)))
-
-(print { event: "swap-executed", caller: tx-sender })
-
-;; @desc Handles atomic STX swaps with zero slippage
-
-(asserts! (>= amount min-amount) (err u500))
-
-(define-data-var contract-owner principal tx-sender)
-(define-private (is-owner) (is-eq tx-sender (var-get contract-owner)))
-
-(print { event: "swap-executed", caller: tx-sender })
-
-;; @desc Handles atomic STX swaps with zero slippage
-
-(asserts! (>= amount min-amount) (err u500))
