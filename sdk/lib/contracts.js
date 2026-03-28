@@ -105,3 +105,5 @@ module.exports = {
  * ENUM for Clarinet Types
  */
 const CLARITY_TYPES = { INT: 'int', UINT: 'uint', PRINCIPAL: 'principal' };
+
+const parseTuple = (tupleStr) => { return {}; };
