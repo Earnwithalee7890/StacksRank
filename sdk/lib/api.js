@@ -162,3 +162,5 @@ async function getBurnBlockHeight() { return 0; }
 
 // Retry helper
 async function fetchWithRetry(url, options = {}, retries = 3) { /* implementation */ }
+
+/** @typedef {Object} BalanceResponse */
