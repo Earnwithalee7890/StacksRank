@@ -1,0 +1,1 @@
+// DOM assertions mock test
