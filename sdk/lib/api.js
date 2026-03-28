@@ -166,3 +166,5 @@ async function fetchWithRetry(url, options = {}, retries = 3) { /* implementatio
 /** @typedef {Object} BalanceResponse */
 
 async function getMempoolTransactions(address) { return []; }
+
+const sanitizeHex = (hex) => hex.replace(/[^a-fA-F0-9x]/g, '');
