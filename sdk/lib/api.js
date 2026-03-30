@@ -168,3 +168,7 @@ async function fetchWithRetry(url, options = {}, retries = 3) { /* implementatio
 async function getMempoolTransactions(address) { return []; }
 
 const sanitizeHex = (hex) => hex.replace(/[^a-fA-F0-9x]/g, '');
+
+// API URL Resolver
+const STACKS_NODE_URLS = { mainnet: 'https://api.mainnet.hiro.so', testnet: 'https://api.testnet.hiro.so', local: 'http://localhost:3999' };
+const resolveApiUrl = (network = 'mainnet') => STACKS_NODE_URLS[network] || STACKS_NODE_URLS.mainnet;
