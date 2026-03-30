@@ -1,0 +1,11 @@
+﻿name: Stacks CI
+on: [push, pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Clarinet
+        run: curl -sL https://github.com/hirosystems/clarinet/releases/download/v2.10.0/clarinet-linux-x64-glibc.tar.gz | tar xz
+      - name: Check contracts
+        run: ./clarinet check
