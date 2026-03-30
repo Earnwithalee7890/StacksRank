@@ -25,3 +25,9 @@ target/
 target/
 *.log
 
+
+# Clarinet local state
+.clarinet/
+settings/
+deployments/local*
+
