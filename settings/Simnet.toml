@@ -2,13 +2,13 @@
 name = "simnet"
 
 [accounts.deployer]
-mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
+mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
 balance = 100000000000000
 
 [accounts.wallet_1]
-mnemonic = "spoil sock coyote screen illusion exotic lease resist security post move owner rug enroll remove moral total enroll wallet ruler mango unit soft borrow"
+mnemonic = "asphalt drastic slice album apple imagine adjust ivory speed air layer allow"
 balance = 100000000000000
 
 [accounts.wallet_2]
-mnemonic = "arrange scale orient half stick situation scale shield process churn pump swap cluster interest work wink never extend shield smile north boost alien woman"
+mnemonic = "clog assign current field achieve chronic mouse second syrup column sort mention"
 balance = 100000000000000
