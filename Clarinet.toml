@@ -1,4 +1,4 @@
-[project]
+﻿[project]
 name = "stacksrank"
 authors = ["Earnwithalee7890"]
 description = "StacksRank - Leaderboard, Swap & Vault Platform"
@@ -62,6 +62,7 @@ epoch = 2.4
 [repl]
 costs_version = 2
 parser_version = 2
+
 
 [repl.analysis]
 passes = ["check_checker"]
