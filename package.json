@@ -18,10 +18,18 @@
     "vault",
     "leaderboard",
     "blockchain",
-    "talent-protocol"
+    "talent-protocol",
+    "bitcoin-l2",
+    "hiro-api"
   ],
   "author": "Earnwithalee7890",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Earnwithalee7890/StacksRank.git"
+  },
+  "homepage": "https://stacks-rank.vercel.app/",
+
   "dependencies": {
     "@stacks/connect": "^7.8.2",
     "@stacks/network": "^6.13.0",
