@@ -136,7 +136,18 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen)
 ![Security](https://img.shields.io/badge/Security-Audited-blue)
 
+---
+
+## 💬 Support & Community
+
+Join our mission to rank the best builders on Stacks:
+
+- **Twitter**: [@StacksRank](https://twitter.com/StacksRank)
+- **Discord**: [Join the Community](https://discord.gg/stacksrank)
+- **Email**: [hello@stacksrank.org](mailto:hello@stacksrank.org)
+
 ## 🏆 Submission Metadata
+
 - **Event**: Stacks Talent Protocol 2026
 - **Status**: Production Ready (Audited & Tested)
 - **Author**: StacksRank Team
