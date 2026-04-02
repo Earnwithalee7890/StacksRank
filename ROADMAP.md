@@ -26,6 +26,13 @@ This roadmap outlines the planned growth for StacksRank as we build the premier 
 - [ ] **Developer Portal**: Automated documentation generation for the SDK.
 - [ ] **Open Analytics**: Real-time TVL and volume charts using Hiro Data.
 
+## Phase 5: Sustainability & Expansion (2027+) 🌍
+- [ ] **Cross-Chain Bridging**: Integration with sBTC for seamless Bitcoin-to-Stacks liquidity.
+- [ ] **Enterprise Services**: White-label reputation systems for other Stacks projects.
+- [ ] **Institutional Vaults**: Enhanced security features for corporate treasury management.
+- [ ] **Global Leaderboard API**: Standardized API for third-party tools to fetch builder rankings.
+
+
 ---
 
 ### Want to contribute?
