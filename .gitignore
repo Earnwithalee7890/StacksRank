@@ -1,33 +1,37 @@
+# Dependency directories
 node_modules/
-.env
-.DS_Store
-
-.DS_Store
-Thumbs.db
-
-# Logs
-logs
-*.log
-npm-debug.log*
-
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Clarinet
-target/
-*.log
-
-
-# Clarinet
-target/
-*.log
-
 
 # Clarinet local state
 .clarinet/
+deployments/*.local-plan.yaml
 settings/
-deployments/local*
+
+# Build artifacts
+dist/
+.cache/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Sensitive local files
+.env
+.env.local
+.secret
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Vercel
+.vercel/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
 
