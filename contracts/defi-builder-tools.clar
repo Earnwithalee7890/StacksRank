@@ -20,7 +20,7 @@
 (define-constant service-request-fee u10000) ;; 0.01 STX
 (define-constant min-donation u10000)       ;; 0.01 STX
 
-;; Cooldown: 144 Bitcoin blocks ≈ 24 hours
+;; Cooldown: 144 Bitcoin blocks ~ 24 hours
 (define-constant cooldown-blocks u144)
 
 ;; Data Maps

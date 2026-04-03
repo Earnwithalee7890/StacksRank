@@ -1,8 +1,7 @@
 [network]
 name = "mainnet"
-stacks_node = "https://std-01.mainnet.stacks.co"
-bitcoin_node = "http://blockstack:blockstacksystem@bitcoin.blockstack.com:8332"
+stacks_node_rpc_address = "https://api.hiro.so"
+deployment_fee_rate = 10
 
 [accounts.deployer]
-mnemonic = "fetch outside black test wash cover just actual execute nice door want airport betray quantum stamp fish act pen trust portion fatigue scissors vague"
-balance = 100000000000000
+mnemonic = "<YOUR PRIVATE MAINNET MNEMONIC HERE>"

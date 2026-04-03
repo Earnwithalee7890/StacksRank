@@ -22,7 +22,7 @@
 (define-map last-claim-height principal uint)
 
 ;; -----------------------------------------------
-;; 1. DEPOSIT — Owner sends STX into the contract
+;; 1. DEPOSIT - Owner sends STX into the contract
 ;; Uses the exact same pattern as reward-vault.clar collect-fee
 ;; -----------------------------------------------
 (define-public (deposit (amount uint))
@@ -34,7 +34,7 @@
 )
 
 ;; -----------------------------------------------
-;; 2. WITHDRAW — Owner pulls STX out of the contract
+;; 2. WITHDRAW - Owner pulls STX out of the contract
 ;; Uses the exact same pattern as reward-vault.clar withdraw-fees
 ;; -----------------------------------------------
 (define-public (withdraw (amount uint))
@@ -50,7 +50,7 @@
 )
 
 ;; -----------------------------------------------
-;; 3. CLAIM — User claims 1 STX once per 24 hours
+;; 3. CLAIM - User claims 1 STX once per 24 hours
 ;; KEY FIX: We save tx-sender as 'claimer' BEFORE entering as-contract
 ;; so that inside as-contract, 'claimer' is still the user, not the contract.
 ;; -----------------------------------------------
@@ -85,7 +85,7 @@
 )
 
 ;; -----------------------------------------------
-;; 4. ADMIN — Update claim amount (owner only)
+;; 4. ADMIN - Update claim amount (owner only)
 ;; -----------------------------------------------
 (define-public (set-claim-amount (new-amount uint))
   (begin
@@ -96,7 +96,7 @@
 )
 
 ;; -----------------------------------------------
-;; 5. ADMIN — Update cooldown in blocks (owner only)
+;; 5. ADMIN - Update cooldown in blocks (owner only)
 ;; -----------------------------------------------
 (define-public (set-cooldown (new-cooldown uint))
   (begin

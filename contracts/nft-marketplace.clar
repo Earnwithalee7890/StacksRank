@@ -290,7 +290,7 @@
         (print { event: "auction-settled", auction-id: auction-id, winner: winner, price: price })
         true
       )
-      ;; No bidders — auction expires
+      ;; No bidders - auction expires
       (print { event: "auction-expired", auction-id: auction-id })
     )
 

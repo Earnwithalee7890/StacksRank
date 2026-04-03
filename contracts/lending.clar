@@ -240,7 +240,7 @@
     (try! (stx-transfer? actual-repay tx-sender (as-contract tx-sender)))
 
     (if is-full-repay
-      ;; Full repay — return collateral and close loan
+      ;; Full repay - return collateral and close loan
       (begin
         (try! (as-contract (stx-transfer? (get collateral-amount updated-loan) tx-sender borrower)))
         (var-set total-collateral (- (var-get total-collateral) (get collateral-amount updated-loan)))

@@ -40,10 +40,10 @@
     (amount (get amount lock))
     (end-block (get end-block lock))
   )
-    (if (or (is-eq amount u0) (<= end-block stacks-block-height))
+    (if (or (is-eq amount u0) (<= end-block block-height))
       u0
       ;; Voting power = (amount * remaining-blocks) / MAX-LOCK-BLOCKS
-      (/ (* amount (- end-block stacks-block-height)) MAX-LOCK-BLOCKS)
+      (/ (* amount (- end-block block-height)) MAX-LOCK-BLOCKS)
     )
   )
 )
@@ -61,7 +61,7 @@
     (current-lock (get-locked-balance user))
     (current-amount (get amount current-lock))
     (current-end (get end-block current-lock))
-    (new-end (+ stacks-block-height lock-blocks))
+    (new-end (+ block-height lock-blocks))
   )
     (asserts! (> amount u0) ERR-INVALID-AMOUNT)
     (asserts! (>= lock-blocks MIN-LOCK-BLOCKS) ERR-LOCK-TOO-SHORT)
@@ -93,7 +93,7 @@
     (end-block (get end-block lock))
   )
     (asserts! (> amount u0) ERR-NOT-LOCKED)
-    (asserts! (>= stacks-block-height end-block) ERR-LOCK-NOT-EXPIRED)
+    (asserts! (>= block-height end-block) ERR-LOCK-NOT-EXPIRED)
 
     ;; Reset lock
     (map-delete locked-balances user)

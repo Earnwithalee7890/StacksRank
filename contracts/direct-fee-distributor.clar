@@ -85,6 +85,3 @@
 ;; END OF CONTRACT
 ;; Note: Fully audited for fee distribution logic.
 
-(asserts! (not (is-eq recipient tx-sender)) (err u100))
-
-(asserts! (not (is-eq recipient tx-sender)) (err u100))

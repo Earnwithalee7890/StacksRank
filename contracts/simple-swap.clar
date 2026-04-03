@@ -68,7 +68,7 @@
       (swap-id (+ (var-get swap-counter) u1))
       (fee (calculate-fee amount))
       (total-amount (+ amount fee))
-      (expiry (+ stacks-block-height duration))
+      (expiry (+ block-height duration))
     )
     (asserts! (> amount u0) ERR-INVALID-AMOUNT)
     (asserts! (> duration u0) ERR-INVALID-AMOUNT)
@@ -103,7 +103,7 @@
     )
     ;; Validations
     (asserts! (is-eq tx-sender counterparty) ERR-NOT-AUTHORIZED)
-    (asserts! (< stacks-block-height (get expiry swap)) ERR-SWAP-EXPIRED)
+    (asserts! (< block-height (get expiry swap)) ERR-SWAP-EXPIRED)
     (asserts! (not (get completed swap)) ERR-SWAP-COMPLETED)
     (asserts! (not (get cancelled swap)) ERR-SWAP-COMPLETED)
     
