@@ -18,3 +18,4 @@ Commit 17 - 2026-04-07 01:00:29 - perf(sdk): cache API results for performance b
 Commit 18 - 2026-04-07 01:00:29 - test(sdk): add integration tests for mainnet network
 Commit 19 - 2026-04-07 01:00:30 - fix(sdk): resolve memory leak in event listener cleanup
 Commit 20 - 2026-04-07 01:00:30 - chore: updated package versioning for internal release
+Commit 21 - 2026-04-07 01:00:31 - feat(sdk): implement reward claim logic for vaults
