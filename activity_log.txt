@@ -14,3 +14,4 @@ Commit 13 - 2026-04-07 01:00:27 - feat(ui): add loading states for SDK data fetc
 Commit 14 - 2026-04-07 01:00:27 - fix(ui): correct leaderboard ranking display logic
 Commit 15 - 2026-04-07 01:00:28 - docs(sdk): add examples for React integration
 Commit 16 - 2026-04-07 01:00:28 - feat(sdk): integrate real-time transaction status tracking
+Commit 17 - 2026-04-07 01:00:29 - perf(sdk): cache API results for performance boost
