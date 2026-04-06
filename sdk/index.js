@@ -10,7 +10,7 @@
  * - Hiro API utilities (balance, transactions, read-only calls)
  * 
  * @example
- * const { encoding, contracts, wallet, api } = require('stacksrank-sdk');
+ * const { encoding, contracts, wallet, api } = require('@earnwithalee/stacksrank-sdk');
  * 
  * // Encode a Clarity string
  * const encoded = encoding.encodeStringAscii("Hello Stacks!");
@@ -21,7 +21,7 @@
  * // Check balance
  * const { stx } = await api.getBalance("SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7");
  * 
- * @module stacksrank-sdk
+ * @module @earnwithalee/stacksrank-sdk
  */
 
 const encoding = require('./lib/encoding');
