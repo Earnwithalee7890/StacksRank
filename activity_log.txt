@@ -25,3 +25,4 @@ Commit 2 - 2026-04-07 01:01:43 - docs(sdk): update installation guide in README
 Commit 3 - 2026-04-07 01:01:43 - fix(sdk): resolve intermittent Hiro API timeout issue
 Commit 4 - 2026-04-07 01:01:43 - perf(sdk): optimize wallet balance fetching logic
 Commit 5 - 2026-04-07 01:01:44 - refactor(sdk): clean up internal contract interaction helpers
+Commit 6 - 2026-04-07 01:01:44 - test(sdk): add unit tests for balance validation
