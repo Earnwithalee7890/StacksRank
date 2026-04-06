@@ -2,3 +2,4 @@ Commit 1 - 2026-04-07 01:00:22 - feat(sdk): add basic leaderboard query support
 Commit 2 - 2026-04-07 01:00:22 - docs(sdk): update installation guide in README
 Commit 3 - 2026-04-07 01:00:23 - fix(sdk): resolve intermittent Hiro API timeout issue
 Commit 4 - 2026-04-07 01:00:23 - perf(sdk): optimize wallet balance fetching logic
+Commit 5 - 2026-04-07 01:00:23 - refactor(sdk): clean up internal contract interaction helpers
