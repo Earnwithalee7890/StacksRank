@@ -23,3 +23,4 @@ Commit 22 - 2026-04-07 01:00:31 - docs: add contributor guidelines for SDK devel
 Commit 1 - 2026-04-07 01:01:42 - feat(sdk): add basic leaderboard query support
 Commit 2 - 2026-04-07 01:01:43 - docs(sdk): update installation guide in README
 Commit 3 - 2026-04-07 01:01:43 - fix(sdk): resolve intermittent Hiro API timeout issue
+Commit 4 - 2026-04-07 01:01:43 - perf(sdk): optimize wallet balance fetching logic
