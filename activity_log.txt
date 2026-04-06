@@ -42,3 +42,4 @@ Commit 19 - 2026-04-07 01:01:48 - fix(sdk): resolve memory leak in event listene
 Commit 20 - 2026-04-07 01:01:49 - chore: updated package versioning for internal release
 Commit 21 - 2026-04-07 01:01:49 - feat(sdk): implement reward claim logic for vaults
 Commit 22 - 2026-04-07 01:01:49 - docs: add contributor guidelines for SDK development
+Commit 23 - 2026-04-07 01:01:50 - fix(sdk): fix incorrect gas estimation for complex swaps
