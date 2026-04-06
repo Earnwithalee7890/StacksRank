@@ -33,3 +33,4 @@ Commit 10 - 2026-04-07 01:01:45 - fix(sdk): handle edge cases in swap fee calcul
 Commit 11 - 2026-04-07 01:01:46 - feat(sdk): add support for SIP-010 token transfers
 Commit 12 - 2026-04-07 01:01:46 - style(sdk): improve code quality and consistent naming
 Commit 13 - 2026-04-07 01:01:46 - feat(ui): add loading states for SDK data fetching
+Commit 14 - 2026-04-07 01:01:47 - fix(ui): correct leaderboard ranking display logic
