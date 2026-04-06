@@ -1,1 +1,2 @@
 Commit 1 - 2026-04-07 01:00:22 - feat(sdk): add basic leaderboard query support
+Commit 2 - 2026-04-07 01:00:22 - docs(sdk): update installation guide in README
