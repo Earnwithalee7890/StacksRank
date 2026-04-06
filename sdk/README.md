@@ -38,7 +38,7 @@ console.log(`Balance: ${stx} STX`);
 ## Wallet Connection (Browser)
 
 ```javascript
-const { wallet } = require('stacksrank-sdk');
+const { wallet } = require('@earnwithalee/stacksrank-sdk');
 
 // Check if wallet is installed
 const { available, provider } = wallet.detectWallet();
