@@ -9,3 +9,4 @@ Commit 8 - 2026-04-07 01:00:25 - chore(deps): update @stacks/connect to latest v
 Commit 9 - 2026-04-07 01:00:25 - docs(sdk): document vault interaction methods
 Commit 10 - 2026-04-07 01:00:25 - fix(sdk): handle edge cases in swap fee calculation
 Commit 11 - 2026-04-07 01:00:26 - feat(sdk): add support for SIP-010 token transfers
+Commit 12 - 2026-04-07 01:00:26 - style(sdk): improve code quality and consistent naming
