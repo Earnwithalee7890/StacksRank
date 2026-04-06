@@ -16,3 +16,4 @@ Commit 15 - 2026-04-07 01:00:28 - docs(sdk): add examples for React integration
 Commit 16 - 2026-04-07 01:00:28 - feat(sdk): integrate real-time transaction status tracking
 Commit 17 - 2026-04-07 01:00:29 - perf(sdk): cache API results for performance boost
 Commit 18 - 2026-04-07 01:00:29 - test(sdk): add integration tests for mainnet network
+Commit 19 - 2026-04-07 01:00:30 - fix(sdk): resolve memory leak in event listener cleanup
