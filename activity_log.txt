@@ -30,3 +30,4 @@ Commit 7 - 2026-04-07 01:01:44 - feat(sdk): implement multi-wallet support for l
 Commit 8 - 2026-04-07 01:01:45 - chore(deps): update @stacks/connect to latest version
 Commit 9 - 2026-04-07 01:01:45 - docs(sdk): document vault interaction methods
 Commit 10 - 2026-04-07 01:01:45 - fix(sdk): handle edge cases in swap fee calculation
+Commit 11 - 2026-04-07 01:01:46 - feat(sdk): add support for SIP-010 token transfers
