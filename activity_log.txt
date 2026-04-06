@@ -48,3 +48,4 @@ Commit 25 - 2026-04-07 01:01:51 - refactor(sdk): consolidate API endpoint config
 Commit 26 - 2026-04-07 01:01:51 - test(sdk): mock Hiro API for faster test execution
 Commit 27 - 2026-04-07 01:01:51 - feat(sdk): enable custom network configuration support
 Commit 28 - 2026-04-07 01:01:52 - docs: clarify licensing for community contributions
+Commit 29 - 2026-04-07 01:01:52 - fix(sdk): handle null responses from Stacks API gracefully
