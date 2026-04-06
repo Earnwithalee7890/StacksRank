@@ -5,3 +5,4 @@ Commit 4 - 2026-04-07 01:00:23 - perf(sdk): optimize wallet balance fetching log
 Commit 5 - 2026-04-07 01:00:23 - refactor(sdk): clean up internal contract interaction helpers
 Commit 6 - 2026-04-07 01:00:24 - test(sdk): add unit tests for balance validation
 Commit 7 - 2026-04-07 01:00:24 - feat(sdk): implement multi-wallet support for leaderboard tracking
+Commit 8 - 2026-04-07 01:00:25 - chore(deps): update @stacks/connect to latest version
