@@ -19,3 +19,4 @@ Commit 18 - 2026-04-07 01:00:29 - test(sdk): add integration tests for mainnet n
 Commit 19 - 2026-04-07 01:00:30 - fix(sdk): resolve memory leak in event listener cleanup
 Commit 20 - 2026-04-07 01:00:30 - chore: updated package versioning for internal release
 Commit 21 - 2026-04-07 01:00:31 - feat(sdk): implement reward claim logic for vaults
+Commit 22 - 2026-04-07 01:00:31 - docs: add contributor guidelines for SDK development
