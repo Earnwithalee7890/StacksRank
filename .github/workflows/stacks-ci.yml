@@ -8,15 +8,22 @@ jobs:
       
       - name: Install Clarinet
         run: |
-          wget https://github.com/stx-labs/clarinet/releases/download/v3.16.0/clarinet-linux-x64-glibc.tar.gz
+          wget https://github.com/hirosystems/clarinet/releases/download/v2.11.0/clarinet-linux-x64-glibc.tar.gz
           tar -xf clarinet-linux-x64-glibc.tar.gz
           chmod +x clarinet
           sudo mv clarinet /usr/local/bin/
+
+      - name: Verify Clarinet
+        run: |
+          clarinet --version
+          clarinet --help
 
       - name: Check contracts
         run: clarinet check
 
       - name: Run tests
         run: clarinet test
+
+
 
 
