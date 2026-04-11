@@ -8,6 +8,8 @@ Official SDK for interacting with [StacksRank](https://github.com/Earnwithalee78
 - 📋 **Contract Registry** — All deployed StacksRank contract addresses and functions
 - 🔗 **Wallet Helpers** — Connect to Leather wallet and call contracts
 - 🌐 **Hiro API Utilities** — Query balances, transactions, and read-only contract calls
+- 📦 **Modern Bundle** — Full ESM support for modern build tools
+- 📘 **TypeScript Ready** — Built-in type declarations for better DX
 - ⚡ **Zero Dependencies** — Pure JavaScript, works in Node.js and browsers
 
 ## Installation

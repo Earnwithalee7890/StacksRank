@@ -1,7 +1,7 @@
 {
   "name": "@earnwithalee/stacksrank-sdk",
-  "version": "1.0.0",
-  "description": "StacksRank - Leaderboard, Swap & Vault Platform for Stacks Ecosystem",
+  "version": "1.1.0",
+  "description": "StacksRank - Premium Leaderboard, Swap & Vault Platform for the Stacks Ecosystem. Includes the official @earnwithalee/stacksrank-sdk.",
   "main": "index.js",
   "scripts": {
     "dev": "serve .",

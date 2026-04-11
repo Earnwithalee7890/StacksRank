@@ -5,18 +5,37 @@
  * No dependencies — uses native fetch.
  */
 
-const API_URLS = {
-    mainnet: 'https://api.hiro.so',
-    testnet: 'https://api.testnet.hiro.so'
+const STACKS_NODE_URLS = {
+    mainnet: 'https://api.mainnet.hiro.so',
+    testnet: 'https://api.testnet.hiro.so',
+    local: 'http://localhost:3999'
 };
 
 /**
- * Get the API base URL for a given network.
+ * API URL Resolver
  * @param {string} [network='mainnet']
  * @returns {string}
  */
-function getApiUrl(network = 'mainnet') {
-    return API_URLS[network] || API_URLS.mainnet;
+const resolveApiUrl = (network = 'mainnet') => STACKS_NODE_URLS[network] || STACKS_NODE_URLS.mainnet;
+
+/**
+ * Fetch with exponential backoff retry
+ * @param {string} url 
+ * @param {Object} [options={}] 
+ * @param {number} [maxRetries=3] 
+ */
+async function fetchWithRetry(url, options = {}, maxRetries = 3) {
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            const res = await fetch(url, options);
+            if (res.ok) return res;
+            if (res.status === 429 || res.status >= 500) throw new Error(`Status ${res.status}`);
+            return res; // Return even if 4xx to handle errors upstream
+        } catch (e) {
+            if (i === maxRetries - 1) throw e;
+            await new Promise(r => setTimeout(r, 1000 * Math.pow(2, i)));
+        }
+    }
 }
 
 /**
@@ -26,149 +45,117 @@ function getApiUrl(network = 'mainnet') {
  * @returns {Promise<{ stx: number, tokens: Object }>}
  */
 async function getBalance(address, network = 'mainnet') {
-    const url = `${getApiUrl(network)}/extended/v1/address/${address}/balances`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`API error: ${res.status} ${res.statusText}`);
+    const url = `${resolveApiUrl(network)}/extended/v1/address/${address}/balances`;
+    const res = await fetchWithRetry(url);
     const data = await res.json();
-
     const stxBalance = parseInt(data.stx?.balance || '0') / 1_000_000;
     const tokens = {};
-
     if (data.fungible_tokens) {
         for (const [key, val] of Object.entries(data.fungible_tokens)) {
             tokens[key] = parseInt(val.balance || '0');
         }
     }
-
     return { stx: stxBalance, tokens };
 }
 
 /**
- * Fetch recent transactions for an address.
- * @param {string} address - Stacks address
- * @param {Object} [options]
- * @param {number} [options.limit=20] - Number of transactions to fetch
- * @param {number} [options.offset=0] - Pagination offset
- * @param {string} [options.network='mainnet']
- * @returns {Promise<Object[]>} Array of transaction objects
+ * Get recent transactions for an address.
  */
 async function getTransactions(address, { limit = 20, offset = 0, network = 'mainnet' } = {}) {
-    const url = `${getApiUrl(network)}/extended/v1/address/${address}/transactions?limit=${limit}&offset=${offset}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`API error: ${res.status} ${res.statusText}`);
+    const url = `${resolveApiUrl(network)}/extended/v1/address/${address}/transactions?limit=${limit}&offset=${offset}`;
+    const res = await fetchWithRetry(url);
     const data = await res.json();
     return data.results || [];
 }
 
 /**
- * Get the current status of a transaction by its ID.
- * @param {string} txId - Transaction ID (with or without 0x prefix)
+ * Get address mempool occupancy
+ * @param {string} address 
+ * @returns {Promise<Object[]>}
+ */
+async function getAddressMempool(address) {
+    const url = `${resolveApiUrl()}/extended/v1/address/${address}/mempool`;
+    return fetchWithRetry(url).then(res => res.json());
+}
+
+/**
+ * Get the status of a specific transaction.
+ * @param {string} txId - Transaction ID
  * @param {string} [network='mainnet']
- * @returns {Promise<Object>} Transaction details
  */
 async function getTransactionStatus(txId, network = 'mainnet') {
-    const cleanId = txId.startsWith('0x') ? txId : `0x${txId}`;
-    const url = `${getApiUrl(network)}/extended/v1/tx/${cleanId}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`API error: ${res.status} ${res.statusText}`);
-    return res.json();
+    const url = `${resolveApiUrl(network)}/extended/v1/tx/${txId}`;
+    const res = await fetchWithRetry(url);
+    const data = await res.json();
+    return data.tx_status;
 }
 
 /**
- * Read a value from a Clarity smart contract (read-only function call).
- * @param {string} contractAddress - The contract deployer address
- * @param {string} contractName - The contract name
- * @param {string} functionName - The read-only function name
- * @param {string[]} [args=[]] - Hex-encoded Clarity arguments
+ * Call a read-only contract function.
+ * @param {string} contractAddress - e.g., "SP...address"
+ * @param {string} contractName - e.g., "contract-name"
+ * @param {string} functionName - e.g., "get-balance"
+ * @param {string[]} [args=[]] - Pre-encoded hex argument strings
+ * @param {string} [sender] - Optional sender address
  * @param {string} [network='mainnet']
- * @returns {Promise<Object>} The response from the read-only call
  */
-async function readContract(contractAddress, contractName, functionName, args = [], network = 'mainnet') {
-    const url = `${getApiUrl(network)}/v2/contracts/call-read/${contractAddress}/${contractName}/${functionName}`;
-    const res = await fetch(url, {
+async function readContract(contractAddress, contractName, functionName, args = [], sender = 'SP000000000000000000002Q6VF78', network = 'mainnet') {
+    const url = `${resolveApiUrl(network)}/v2/contracts/call-read/${contractAddress}/${contractName}/${functionName}`;
+    const res = await fetchWithRetry(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            sender: contractAddress,
-            arguments: args
-        })
+        body: JSON.stringify({ sender, arguments: args })
     });
-    if (!res.ok) throw new Error(`API error: ${res.status} ${res.statusText}`);
     return res.json();
 }
 
 /**
- * Get info about a deployed smart contract.
- * @param {string} contractId - Full contract ID (e.g., "SP...addr.contract-name")
+ * Get the current block height.
  * @param {string} [network='mainnet']
- * @returns {Promise<Object>} Contract info including source code
- */
-async function getContractInfo(contractId, network = 'mainnet') {
-    const url = `${getApiUrl(network)}/extended/v1/contract/${contractId}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`API error: ${res.status} ${res.statusText}`);
-    return res.json();
-}
-
-/**
- * Get the current Stacks block height.
- * @param {string} [network='mainnet']
- * @returns {Promise<number>}
  */
 async function getBlockHeight(network = 'mainnet') {
-    const url = `${getApiUrl(network)}/extended/v1/block?limit=1`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`API error: ${res.status} ${res.statusText}`);
+    const url = `${resolveApiUrl(network)}/extended/v1/block?limit=1`;
+    const res = await fetchWithRetry(url);
     const data = await res.json();
     return data.results?.[0]?.height || 0;
 }
 
 /**
  * Convert microSTX to STX.
- * @param {number|string} microStx
- * @returns {number}
  */
-function microToStx(microStx) {
-    return parseInt(microStx) / 1_000_000;
+function microToStx(val) {
+    return Number(val) / 1_000_000;
 }
 
 /**
  * Convert STX to microSTX.
- * @param {number} stx
- * @returns {number}
  */
-function stxToMicro(stx) {
-    return Math.round(stx * 1_000_000);
+function stxToMicro(val) {
+    return Math.floor(Number(val) * 1_000_000);
 }
 
-module.exports = {
-    API_URLS,
-    getApiUrl,
-    getBalance,
-    getTransactions,
-    getTransactionStatus,
-    readContract,
-    getContractInfo,
-    getBlockHeight,
-    microToStx,
-    stxToMicro
+/**
+ * Sanitizes a Stacks principal string.
+ * @param {string} p - Principal to check
+ * @returns {string|null} The principal if valid, else null
+ */
+const sanitizePrincipal = (p) => {
+    if (!p || typeof p !== 'string') return null;
+    return p.trim().split(".").length >= 1 ? p.trim() : null;
 };
 
-// Helper: parse api url safely
-const parseApiUrl = (url) => new URL(url).toString();
+module.exports = {
+    resolveApiUrl,
+    fetchWithRetry,
+    getBalance,
+    getTransactions,
+    getAddressMempool,
+    getTransactionStatus,
+    readContract,
+    getBlockHeight,
+    microToStx,
+    stxToMicro,
+    sanitizePrincipal
+};
 
-// 2.1 Support: getBurnBlockHeight
-async function getBurnBlockHeight() { return 0; }
 
-// Retry helper
-async function fetchWithRetry(url, options = {}, retries = 3) { /* implementation */ }
-
-/** @typedef {Object} BalanceResponse */
-
-async function getMempoolTransactions(address) { return []; }
-
-const sanitizeHex = (hex) => hex.replace(/[^a-fA-F0-9x]/g, '');
-
-// API URL Resolver
-const STACKS_NODE_URLS = { mainnet: 'https://api.mainnet.hiro.so', testnet: 'https://api.testnet.hiro.so', local: 'http://localhost:3999' };
-const resolveApiUrl = (network = 'mainnet') => STACKS_NODE_URLS[network] || STACKS_NODE_URLS.mainnet;

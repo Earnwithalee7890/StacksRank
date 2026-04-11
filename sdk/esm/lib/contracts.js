@@ -1,10 +1,10 @@
 /**
- * StacksRank SDK - Clarity Contract Constants
+ * StacksRank SDK - Clarity Contract Constants (ESM)
  */
 
-const DEPLOYER = 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT';
+export const DEPLOYER = 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT';
 
-const CONTRACTS = {
+export const CONTRACTS = {
     REPUTATION: {
         address: `${DEPLOYER}.simple-reputation`,
         functions: {
@@ -53,7 +53,7 @@ const CONTRACTS = {
     }
 };
 
-const CLARITY_CODE = {
+export const CLARITY_CODE = {
     SUCCESS: 0,
     ERR_UNAUTHORIZED: 401,
     ERR_NOT_FOUND: 404,
@@ -61,10 +61,7 @@ const CLARITY_CODE = {
     ERR_FORBIDDEN: 403
 };
 
-/**
- * Common Clarity traits and types used for UI mapping.
- */
-const CLARITY_TYPES = {
+export const CLARITY_TYPES = {
     INT: 'int',
     UINT: 'uint',
     PRINCIPAL: 'principal',
@@ -75,10 +72,7 @@ const CLARITY_TYPES = {
     LIST: 'list'
 };
 
-/**
- * Standard SIP-010 Trait Response types
- */
-const SIP010_TYPES = {
+export const SIP010_TYPES = {
     TRANSFER: 'transfer',
     GET_NAME: 'get-name',
     GET_SYMBOL: 'get-symbol',
@@ -88,24 +82,10 @@ const SIP010_TYPES = {
     GET_TOKEN_URI: 'get-token-uri'
 };
 
-/**
- * Get a flat map of all contract addresses
- */
-function getContractAddresses() {
+export function getContractAddresses() {
     const addresses = {};
     for (const [key, val] of Object.entries(CONTRACTS)) {
         addresses[key] = val.address;
     }
     return addresses;
 }
-
-module.exports = {
-    DEPLOYER,
-    CONTRACTS,
-    CLARITY_CODE,
-    CLARITY_TYPES,
-    SIP010_TYPES,
-    getContractAddresses
-};
-
-
