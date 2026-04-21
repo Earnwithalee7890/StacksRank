@@ -41,6 +41,9 @@
     "url": "https://github.com/Earnwithalee7890/StacksRank/issues"
   },
   "homepage": "https://github.com/Earnwithalee7890/StacksRank#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "engines": {
     "node": ">=14.0.0"
   }
