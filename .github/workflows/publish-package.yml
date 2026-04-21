@@ -22,13 +22,13 @@ jobs:
         with:
           node-version: '20.x'
           registry-url: 'https://npm.pkg.github.com'
-          scope: '@earnwithalee'
+          scope: '@earnwithalee7890'
 
       - name: Configure package for GitHub Packages
         working-directory: ./sdk
         run: |
           # Create a .npmrc for GitHub Packages auth
-          echo "@earnwithalee:registry=https://npm.pkg.github.com" > .npmrc
+          echo "@earnwithalee7890:registry=https://npm.pkg.github.com" > .npmrc
           echo "//npm.pkg.github.com/:_authToken=\${NODE_AUTH_TOKEN}" >> .npmrc
 
       - name: Publish to GitHub Packages
