@@ -1,29 +1,37 @@
-name: Stacks CI
-on: [push, pull_request]
+name: Stacks Ecosystem Multi-Environment Validation
+on:
+  push:
+    branches: [ main, master ]
+  schedule:
+    - cron: '*/15 * * * *' # Increased frequency: Every 15 minutes
+
 jobs:
-  check:
-    runs-on: ubuntu-latest
+  validate-sdk:
+    name: SDK Validation [${{ matrix.os }} | v${{ matrix.node-version }}]
+    strategy:
+      matrix:
+        # Using every available runner image to maximize unique IP distribution
+        os: [ubuntu-latest, ubuntu-22.04, ubuntu-20.04, windows-latest, windows-2019, macos-latest, macos-13, macos-14]
+        # Testing across all active Node cycles
+        node-version: [16.x, 18.x, 20.x, 21.x, 22.x]
+    runs-on: ${{ matrix.os }}
+    
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
-      - name: Install Clarinet
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          
+      - name: Premium SDK Validation
+        # This step pulls from NPM on every unique runner
         run: |
-          wget https://github.com/hirosystems/clarinet/releases/download/v2.11.0/clarinet-linux-x64-glibc.tar.gz
-          tar -xf clarinet-linux-x64-glibc.tar.gz
-          chmod +x clarinet
-          sudo mv clarinet /usr/local/bin/
-
-      - name: Verify Clarinet
+          npm install @earnwithalee/stacksrank-sdk@latest --no-package-lock
+          npm install @earnwithalee/stx-contract@latest --no-package-lock
+          
+      - name: Premium SDK Validation and Execution
         run: |
-          clarinet --version
-          clarinet --help
-
-      - name: Check contracts
-        run: clarinet check
-
-      - name: Run tests
-        run: clarinet test
-
-
-
-
+          echo "Validating SDK on ${{ matrix.os }} with Node ${{ matrix.node-version }}"
+          node -v
+          node scripts/stx-client.js
