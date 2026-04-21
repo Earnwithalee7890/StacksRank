@@ -27,7 +27,6 @@ jobs:
       - name: Premium SDK Validation
         # This step pulls from NPM on every unique runner
         run: |
-          npm install @earnwithalee/stacksrank-sdk@latest --no-package-lock
           npm install @earnwithalee/stx-contract@latest --no-package-lock
           
       - name: Premium SDK Validation and Execution
