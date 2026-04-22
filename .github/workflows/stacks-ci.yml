@@ -2,18 +2,14 @@ name: Stacks Ecosystem Multi-Environment Validation
 on:
   push:
     branches: [ main, master ]
-  schedule:
-    - cron: '*/15 * * * *' # Increased frequency: Every 15 minutes
 
 jobs:
   validate-sdk:
     name: SDK Validation [${{ matrix.os }} | v${{ matrix.node-version }}]
     strategy:
       matrix:
-        # Using every available runner image to maximize unique IP distribution
-        os: [ubuntu-latest, ubuntu-22.04, ubuntu-20.04, windows-latest, windows-2019, macos-latest, macos-13, macos-14]
-        # Testing across all active Node cycles
-        node-version: [16.x, 18.x, 20.x, 21.x, 22.x]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [18.x, 20.x]
     runs-on: ${{ matrix.os }}
     
     steps:
