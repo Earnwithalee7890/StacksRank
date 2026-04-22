@@ -10,6 +10,8 @@
 [![Stacks](https://img.shields.io/badge/Stacks-Clarity%203%20%26%204-5546FF?style=for-the-badge&logo=stacks)](https://stacks.co)
 [![npm version](https://img.shields.io/npm/v/@earnwithalee/stacksrank-sdk?style=for-the-badge&color=orange)](https://www.npmjs.com/package/@earnwithalee/stacksrank-sdk)
 [![npm downloads](https://img.shields.io/npm/dm/@earnwithalee/stacksrank-sdk?style=for-the-badge&color=blue)](https://www.npmjs.com/package/@earnwithalee/stacksrank-sdk)
+[![stx-contract version](https://img.shields.io/npm/v/@earnwithalee/stx-contract?style=for-the-badge&color=orange&label=stx-contract)](https://www.npmjs.com/package/@earnwithalee/stx-contract)
+[![stx-contract downloads](https://img.shields.io/npm/dw/@earnwithalee/stx-contract?style=for-the-badge&color=blue&label=stx-contract%20downloads)](https://www.npmjs.com/package/@earnwithalee/stx-contract)
 [![Reward Pool](https://img.shields.io/badge/Reward%20Pool-15%2C300%20STX-success?style=for-the-badge&logo=bitcoin)](https://talentprotocol.com)
 [![Event](https://img.shields.io/badge/Event-Talent%20Protocol-purple?style=for-the-badge)](https://talentprotocol.com)
 
@@ -43,15 +45,20 @@ This project is meticulously crafted to maximize the **tier-ranking criteria** d
 
 ---
 
-## 📦 Official SDK
+## 📦 Official SDKs
 
-We've launched an easy-to-use SDK for developers who want to integrate StacksRank data or Clarity utilities into their own apps.
+We've launched two powerful SDKs for developers who want to integrate StacksRank data or Clarity utilities into their own apps.
 
+### 1. StacksRank Core SDK
 **`npm install @earnwithalee/stacksrank-sdk`**
-
 - **Clarity Encoding**: Pure JS encoding for all Clarity types.
 - **Contract Registry**: Programmatic access to all StacksRank contract addresses.
-- **API Helpers**: Quick Hiro API balance and transaction lookups.
+
+### 2. Premium Stx-Contract SDK
+**`npm install @earnwithalee/stx-contract`**
+- **Simplified Clarity Calls**: Wrap binary data into easy-to-use JS objects.
+- **TypeScript Ready**: Built-in type declarations for better DX.
+- **Vite/Next.js Optimized**: Premium performance for modern stacks.
 
 [View SDK Documentation](./sdk/README.md)
 
