@@ -1,15 +1,32 @@
 {
   "name": "@earnwithalee/stacksrank-sdk",
-  "version": "1.1.0",
-  "description": "StacksRank - Premium Leaderboard, Swap & Vault Platform for the Stacks Ecosystem. Includes the official @earnwithalee/stacksrank-sdk.",
-  "main": "index.js",
+  "version": "1.2.0",
+  "description": "StacksRank SDK — Decentralized ranking, analytics, and smart contract toolkit for the Stacks Bitcoin L2 ecosystem",
+  "main": "sdk/index.js",
+  "module": "sdk/esm/index.js",
+  "types": "sdk/types/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./sdk/index.js",
+      "types": "./sdk/types/index.d.ts"
+    }
+  },
+  "files": [
+    "sdk/index.js",
+    "sdk/esm/",
+    "sdk/types/",
+    "sdk/lib/",
+    "sdk/README.md",
+    "sdk/LICENSE"
+  ],
   "scripts": {
     "dev": "serve .",
-    "build": "echo 'Static site build complete'",
+    "build": "echo 'Build complete'",
     "start": "serve .",
-    "test": "jest",
+    "test": "node sdk/test.js",
     "test:contracts": "clarinet check",
-    "test:sdk": "node scripts/stx-client.js"
+    "test:sdk": "node scripts/stx-client.js",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "stacks",
@@ -21,15 +38,29 @@
     "blockchain",
     "talent-protocol",
     "bitcoin-l2",
-    "hiro-api"
+    "hiro-api",
+    "smart-contracts",
+    "web3",
+    "stx",
+    "bitcoin"
   ],
   "author": "Earnwithalee7890",
   "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Earnwithalee7890/StacksRank.git"
   },
-  "homepage": "https://stacks-rank.vercel.app/",
+  "homepage": "https://github.com/Earnwithalee7890/StacksRank#readme",
+  "bugs": {
+    "url": "https://github.com/Earnwithalee7890/StacksRank/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "dependencies": {
     "@earnwithalee/stx-contract": "^1.0.0",
     "@stacks/connect": "^7.8.2",

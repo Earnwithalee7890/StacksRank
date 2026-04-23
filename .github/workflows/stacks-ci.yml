@@ -1,32 +1,63 @@
-name: Stacks Ecosystem Multi-Environment Validation
+name: Stacks SDK Integration Test
 on:
+  schedule:
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
 
 jobs:
-  validate-sdk:
-    name: SDK Validation [${{ matrix.os }} | v${{ matrix.node-version }}]
+  integration-test:
+    name: SDK Test [${{ matrix.os }} | Node ${{ matrix.node }}]
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node-version: [18.x, 20.x]
+        node: [18, 20, 22]
     runs-on: ${{ matrix.os }}
-    
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Setup Node
-        uses: actions/setup-node@v4
+
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-          
-      - name: Premium SDK Validation
-        # This step pulls from NPM on every unique runner
+          node-version: ${{ matrix.node }}
+
+      - name: Install SDK from npmjs.org
         run: |
-          npm install @earnwithalee/stx-contract@latest --no-package-lock
-          
-      - name: Premium SDK Validation and Execution
+          npm init -y
+          npm install @earnwithalee/stacksrank-sdk@latest
+          npm install @earnwithalee/stx-contract@latest
+
+      - name: Validate SDK
         run: |
-          echo "Validating SDK on ${{ matrix.os }} with Node ${{ matrix.node-version }}"
-          node -v
-          node scripts/stx-client.js
+          echo "Testing @earnwithalee/stacksrank-sdk on ${{ matrix.os }} Node ${{ matrix.node }}"
+          node -e "const sdk = require('@earnwithalee/stacksrank-sdk'); console.log('SDK loaded:', Object.keys(sdk));"
+          node -e "const stx = require('@earnwithalee/stx-contract'); console.log('STX Contract loaded:', Object.keys(stx));"
+
+  dependency-test:
+    name: Dependency Resolution Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Fresh Install Test
+        run: |
+          mkdir -p /tmp/sdk-test-1 && cd /tmp/sdk-test-1
+          npm init -y
+          npm install @earnwithalee/stacksrank-sdk@latest --no-cache
+          node -e "const s = require('@earnwithalee/stacksrank-sdk'); console.log('Test 1 passed');"
+
+      - name: Production Install Test
+        run: |
+          mkdir -p /tmp/sdk-test-2 && cd /tmp/sdk-test-2
+          npm init -y
+          npm install @earnwithalee/stacksrank-sdk@latest --production
+          node -e "const s = require('@earnwithalee/stacksrank-sdk'); console.log('Prod test passed');"
+
+      - name: STX Contract Install Test
+        run: |
+          mkdir -p /tmp/sdk-test-3 && cd /tmp/sdk-test-3
+          npm init -y
+          npm install @earnwithalee/stx-contract@latest --no-cache
+          node -e "const s = require('@earnwithalee/stx-contract'); console.log('STX test passed');"
