@@ -71,7 +71,7 @@ function showNotification(message, type = 'info') {
 // ============================================================
 
 async function connectWallet() {
-    console.log('🔗 Connecting wallet via LeatherProvider...');
+    SRLogger.info('🔗 Connecting wallet via LeatherProvider...');
 
     if (!window.LeatherProvider) {
         showNotification('📦 Please install Leather wallet extension!', 'warning');
@@ -80,7 +80,7 @@ async function connectWallet() {
 
     try {
         const response = await window.LeatherProvider.request('getAddresses');
-        console.log('📋 getAddresses response:', response);
+        SRLogger.info('📋 getAddresses response:', response);
 
         let stxAddr = null;
 
@@ -91,7 +91,7 @@ async function connectWallet() {
 
         if (!stxAddr) {
             const fallback = await window.LeatherProvider.request('stx_requestAccounts');
-            console.log('📋 stx_requestAccounts response:', fallback);
+            SRLogger.info('📋 stx_requestAccounts response:', fallback);
             if (fallback?.result?.addresses?.[0]?.address) {
                 stxAddr = fallback.result.addresses[0].address;
             }
@@ -108,7 +108,7 @@ async function connectWallet() {
         }
 
     } catch (error) {
-        console.error('❌ Wallet connection error:', error);
+        SRLogger.error('❌ Wallet connection error:', error);
         showNotification('❌ Failed to connect wallet: ' + (error.message || error), 'error');
     }
 }
@@ -173,7 +173,7 @@ async function callContract({ contract, functionName, functionArgs = [] }) {
         throw new Error('Wallet not connected. Please connect first.');
     }
 
-    console.log(`🚀 Calling ${contract}.${functionName} with`, functionArgs.length, 'args');
+    SRLogger.info(`🚀 Calling ${contract}.${functionName} with`, functionArgs.length, 'args');
 
     const response = await window.LeatherProvider.request('stx_callContract', {
         contract,
@@ -184,7 +184,7 @@ async function callContract({ contract, functionName, functionArgs = [] }) {
         appDetails
     });
 
-    console.log('✅ Contract call response:', response);
+    SRLogger.info('✅ Contract call response:', response);
     return response;
 }
 
@@ -216,7 +216,7 @@ async function dailyCheckIn() {
             showNotification('⚠️ Check-in may have been cancelled', 'warning');
         }
     } catch (error) {
-        console.error('❌ Check-in error:', error);
+        SRLogger.error('❌ Check-in error:', error);
         showNotification('❌ ' + (error.message || 'Check-in failed'), 'error');
     } finally {
         if (btn) { btn.disabled = false; btn.textContent = '✅ Daily Check-in'; }
@@ -253,7 +253,7 @@ async function executeSwap() {
             showNotification('⚠️ Swap may have been cancelled', 'warning');
         }
     } catch (error) {
-        console.error('❌ Swap error:', error);
+        SRLogger.error('❌ Swap error:', error);
         showNotification('❌ ' + (error.message || 'Swap failed'), 'error');
     } finally {
         if (btn) { btn.disabled = false; btn.textContent = 'Swap Tokens'; }
@@ -290,7 +290,7 @@ async function createVault() {
             showNotification('⚠️ Vault creation may have been cancelled', 'warning');
         }
     } catch (error) {
-        console.error('❌ Vault error:', error);
+        SRLogger.error('❌ Vault error:', error);
         showNotification('❌ ' + (error.message || 'Vault creation failed'), 'error');
     } finally {
         if (btn) { btn.disabled = false; btn.textContent = 'Create Vault'; }
@@ -327,7 +327,7 @@ async function stakeInVault() {
             showNotification('⚠️ Staking may have been cancelled', 'warning');
         }
     } catch (error) {
-        console.error('❌ Staking error:', error);
+        SRLogger.error('❌ Staking error:', error);
         showNotification('❌ ' + (error.message || 'Staking failed'), 'error');
     } finally {
         if (btn) { btn.disabled = false; btn.textContent = 'Stake Tokens'; }
@@ -376,7 +376,7 @@ async function registerBuilder() {
             showNotification('⚠️ Registration may have been cancelled', 'warning');
         }
     } catch (error) {
-        console.error('❌ Registration error:', error);
+        SRLogger.error('❌ Registration error:', error);
         showNotification('❌ ' + (error.message || 'Registration failed'), 'error');
     } finally {
         if (btn) { btn.disabled = false; btn.textContent = 'Register Builder'; }
@@ -415,7 +415,7 @@ async function updateBuilderStatus() {
             showNotification('⚠️ Update may have been cancelled', 'warning');
         }
     } catch (error) {
-        console.error('❌ Update error:', error);
+        SRLogger.error('❌ Update error:', error);
         showNotification('❌ ' + (error.message || 'Update failed'), 'error');
     } finally {
         if (btn) { btn.disabled = false; btn.textContent = 'Update Status'; }
@@ -459,7 +459,7 @@ async function requestBuilderService() {
             showNotification('⚠️ Request may have been cancelled', 'warning');
         }
     } catch (error) {
-        console.error('❌ Request error:', error);
+        SRLogger.error('❌ Request error:', error);
         showNotification('❌ ' + (error.message || 'Request failed'), 'error');
     } finally {
         if (btn) { btn.disabled = false; btn.textContent = 'Request Service'; }
@@ -489,7 +489,7 @@ async function payProtocolFee() {
             showNotification('⚠️ Payment may have been cancelled', 'warning');
         }
     } catch (error) {
-        console.error('❌ Payment error:', error);
+        SRLogger.error('❌ Payment error:', error);
         showNotification('❌ ' + (error.message || 'Payment failed'), 'error');
     } finally {
         if (btn) { btn.disabled = false; btn.textContent = 'Pay 0.02 STX Fee'; }
@@ -520,7 +520,7 @@ async function claimDistribution() {
             showNotification('⚠️ Claim may have been cancelled', 'warning');
         }
     } catch (error) {
-        console.error('❌ Claim error:', error);
+        SRLogger.error('❌ Claim error:', error);
         showNotification('❌ ' + (error.message || 'Claim failed'), 'error');
     } finally {
         if (btn) { btn.disabled = false; btn.textContent = '🎁 Claim 1 STX'; }
@@ -543,7 +543,7 @@ async function fetchAccountBalance(address) {
         const el = document.getElementById('balanceIn');
         if (el) { el.textContent = `${balance} STX`; el.style.color = '#4facfe'; }
     } catch (e) {
-        console.warn('Could not fetch balance:', e);
+        SRLogger.warn('Could not fetch balance:', e);
     }
 }
 
@@ -691,8 +691,8 @@ function attachListeners() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 StacksRank initializing...');
-    console.log('🔍 LeatherProvider available:', !!window.LeatherProvider);
+    SRLogger.info('🚀 StacksRank initializing...');
+    SRLogger.info('🔍 LeatherProvider available:', !!window.LeatherProvider);
 
     attachListeners();
     loadLeaderboard();
@@ -700,4 +700,4 @@ document.addEventListener('DOMContentLoaded', () => {
     loadUserVaults();
 });
 
-console.log('✨ StacksRank app-leather.js loaded!');
+SRLogger.info('✨ StacksRank app-leather.js loaded!');
