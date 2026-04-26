@@ -1,3 +1,4 @@
+;; SPDX-License-Identifier: MIT
 ;; Advanced AMM Swap Contract - StacksRank v2
 ;; Automated Market Maker with slippage protection, price impact calculation,
 ;; multi-route support, and liquidity provider fee sharing.

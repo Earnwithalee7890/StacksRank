@@ -1,3 +1,4 @@
+;; SPDX-License-Identifier: MIT
 ;; Collateralized Lending Contract - StacksRank
 ;; Users deposit STX as collateral and borrow against it.
 ;; Liquidation kicks in when health factor drops below 1.0.

@@ -1,3 +1,4 @@
+;; SPDX-License-Identifier: MIT
 ;; Price Oracle Contract - StacksRank
 ;; Decentralized TWAP (Time-Weighted Average Price) oracle.
 ;; Multiple trusted reporters submit prices; TWAP is computed over a window.

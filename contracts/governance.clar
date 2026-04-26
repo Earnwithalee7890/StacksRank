@@ -1,3 +1,4 @@
+;; SPDX-License-Identifier: MIT
 ;; Governance Contract - StacksRank DAO
 ;; Token-weighted voting for protocol parameter changes.
 (impl-trait .governance-trait.governance-trait)
