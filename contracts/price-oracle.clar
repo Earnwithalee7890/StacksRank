@@ -230,9 +230,10 @@
   )
 )
 
-;; ───────────────────────────────────────────────────────────
-;; INIT
-;; ───────────────────────────────────────────────────────────
+;; @desc Price Oracle Contract
+;; Provides a secure, multi-reporter price feed for the Stacks ecosystem.
+;; Features TWAP calculation, staleness checks, and circuit breakers.
+
 (begin
   (var-set reporter-count u0)
   ;; Register default feeds
@@ -253,7 +254,3 @@
     observation-count: u0
   })
 )
-
-(asserts! (< (- block-height (var-get last-update)) u10) (err u600))
-
-(asserts! (< (- block-height (var-get last-update)) u10) (err u600))
