@@ -45,3 +45,19 @@ The core logic of the platform, written in Clarity. These contracts handle reput
 3. Reputation is calculated based on predefined criteria.
 4. User can perform DeFi actions (swap, deposit to vault).
 5. Actions are signed by the wallet and broadcast to the Stacks network.
+
+## Security Architecture
+
+### 1. Smart Contract Security
+- **Post-conditions**: All contract calls use Stacks post-conditions to ensure assets are only transferred according to user expectations.
+- **Circuit Breakers**: Core contracts (Swap, Oracle) include pause/unpause functionality for emergency situations.
+- **Validation**: All public functions include strict `asserts!` for input validation and authorization.
+
+### 2. Frontend Security
+- **Direct Injection**: Uses LeatherProvider directly to avoid supply-chain attacks via complex library dependencies.
+- **Input Sanitization**: All user inputs are sanitized before being encoded for Clarity calls.
+- **Secure Storage**: Sensitive data is never stored in cleartext in localStorage.
+
+## Future Scalability
+- **SIP-010 Support**: Expansion to support arbitrary SIP-010 tokens via trait-based routing.
+- **DAO Governance**: Transitioning protocol parameters to a decentralized governance model (ongoing).
