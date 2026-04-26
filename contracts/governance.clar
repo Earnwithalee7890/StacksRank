@@ -10,15 +10,19 @@
 ;; CONSTANTS
 ;; ───────────────────────────────────────────────────────────
 (define-constant CONTRACT-OWNER tx-sender)
-(define-constant ERR-NOT-AUTHORIZED    (err u500))
-(define-constant ERR-PROPOSAL-EXPIRED  (err u501))
-(define-constant ERR-ALREADY-VOTED     (err u502))
-(define-constant ERR-PROPOSAL-NOT-FOUND (err u503))
-(define-constant ERR-QUORUM-NOT-MET    (err u504))
-(define-constant ERR-PROPOSAL-ACTIVE   (err u505))
-(define-constant ERR-INVALID-VOTE      (err u506))
-(define-constant ERR-ALREADY-EXECUTED  (err u507))
-(define-constant ERR-INVALID-PROPOSAL  (err u508))
+
+;; ───────────────────────────────────────────────────────────
+;; ERROR CODES
+;; ───────────────────────────────────────────────────────────
+(define-constant ERR-NOT-AUTHORIZED    (err u500)) ;; Unauthorized caller
+(define-constant ERR-PROPOSAL-EXPIRED  (err u501)) ;; Voting period has ended
+(define-constant ERR-ALREADY-VOTED     (err u502)) ;; User has already cast a vote
+(define-constant ERR-PROPOSAL-NOT-FOUND (err u503)) ;; Proposal ID does not exist
+(define-constant ERR-QUORUM-NOT-MET    (err u504)) ;; Minimum participation not reached
+(define-constant ERR-PROPOSAL-ACTIVE   (err u505)) ;; Cannot execute while voting is active
+(define-constant ERR-INVALID-VOTE      (err u506)) ;; Incorrect vote parameters
+(define-constant ERR-ALREADY-EXECUTED  (err u507)) ;; Proposal was already finalized
+(define-constant ERR-INVALID-PROPOSAL  (err u508)) ;; Data validation failed for proposal
 
 ;; Voting period: ~7 days on Stacks (~1008 blocks)
 (define-constant VOTING-PERIOD u1008)
