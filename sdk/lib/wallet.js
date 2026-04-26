@@ -96,9 +96,30 @@ function formatAddress(address, startChars = 6, endChars = 4) {
     return `${address.slice(0, startChars)}...${address.slice(-endChars)}`;
 }
 
+/**
+ * Fetch the STX balance of a given address.
+ * @param {string} address - The STX address to check
+ * @param {string} [network='mainnet'] - 'mainnet' or 'testnet'
+ * @returns {Promise<number>} Balance in microstacks
+ */
+async function getBalance(address, network = 'mainnet') {
+    const baseUrl = network === 'mainnet' ? 'https://api.mainnet.hiro.so' : 'https://api.testnet.hiro.so';
+    const url = `${baseUrl}/extended/v1/address/${address}/balances`;
+    
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        return parseInt(data.stx.balance, 10);
+    } catch (error) {
+        console.error('Error fetching balance:', error);
+        return 0;
+    }
+}
+
 module.exports = {
     detectWallet,
     connectWallet,
     callContract,
-    formatAddress
+    formatAddress,
+    getBalance
 };
