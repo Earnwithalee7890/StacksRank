@@ -1,34 +1,58 @@
-# 🤝 Contributing to StacksRank
+# Contributing to StacksRank
 
-We welcome contributions from the community! Whether you're fixing bugs, adding features, improving documentation, or refining the UI, your input is valuable.
+First off, thank you for considering contributing to StacksRank! It's people like you that make StacksRank such a great tool for the Stacks ecosystem.
 
-## 🚀 How to Contribute
+## Code of Conduct
 
-1.  **Fork the Project**: Click the "Fork" button on GitHub.
-2.  **Create your Feature Branch**:
-    ```bash
-    git checkout -b feature/AmazingFeature
-    ```
-3.  **Commit your Changes**:
-    Use clear and descriptive commit messages.
-    ```bash
-    git commit -m 'feat: Add some AmazingFeature'
-    ```
-4.  **Push to the Branch**:
-    ```bash
-    git push origin feature/AmazingFeature
-    ```
-5.  **Open a Pull Request**: Describe your changes and link any related issues.
+By participating in this project, you are expected to uphold our [Code of Conduct](CODE_OF_CONDUCT.md).
 
-## 🛠️ Development Guidelines
+## How Can I Contribute?
 
-- **Code Style**: We use Prettier and ESLint. Ensure your code is formatted before submitting.
-- **Clarity Contracts**: Ensure contracts are tested using `clarinet test`.
-- **Documentation**: If you change functionality, update the relevant `.md` files.
+### Reporting Bugs
 
-## 🏆 Rewards
+- Check the [issue tracker](https://github.com/Earnwithalee7890/StacksRank/issues) to see if the bug has already been reported.
+- If you find a new bug, please open a new issue, providing as much information as possible.
 
-As part of the **Stacks Builder Rewards** campaign, high-quality contributions may be eligible for recognition and reward distribution.
+### Suggesting Enhancements
 
----
-Built with ❤️ for Stacks.
+- Enhancement suggestions are tracked as [GitHub issues](https://github.com/Earnwithalee7890/StacksRank/issues).
+- Describe the feature you'd like to see and why it would be useful.
+
+### Pull Requests
+
+1. Fork the repo and create your branch from `main`.
+2. If you've added code that should be tested, add tests.
+3. If you've changed APIs, update the documentation.
+4. Ensure the test suite passes.
+5. Make sure your code lints.
+6. Issue that pull request!
+
+## Styleguides
+
+### Git Commit Messages
+
+- Use the present tense ("Add feature" not "Added feature")
+- Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
+- Limit the first line to 72 characters or less
+- Reference issues and pull requests liberally after the first line
+
+### JavaScript Styleguide
+
+- Use ES6+ features.
+- Follow the existing code style (standard JS).
+- Use JSDoc for functions.
+
+### Clarity Styleguide
+
+- Use descriptive names for variables and functions.
+- Add comments to complex logic.
+- Follow the [Clarity Style Guide](https://docs.stacks.co/docs/write-smart-contracts/style-guide).
+
+## Development Setup
+
+1. Clone the repository.
+2. Install dependencies: `npm install`.
+3. Run the development server: `npm run dev`.
+4. Run tests: `npm test`.
+
+Happy coding!
