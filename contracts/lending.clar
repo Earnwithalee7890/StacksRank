@@ -164,21 +164,26 @@
 ;; PUBLIC: LENDING
 ;; ───────────────────────────────────────────────────────────
 
-;; Open a loan: deposit collateral and borrow up to 70% LTV
+;; @desc Open a loan: deposit collateral and borrow up to 70% LTV
+;; @param collateral-amount: Amount of STX to lock as collateral
+;; @param borrow-amount: Amount of STX to borrow from the pool
+;; @returns (response {collateral: uint, borrowed: uint, max-borrow: uint} uint)
 (define-public (open-loan (collateral-amount uint) (borrow-amount uint))
   (let (
+    ;; Calculate maximum allowed loan based on 70% LTV
     (max-borrow (unwrap! (get-max-borrow collateral-amount) ERR-INVALID-AMOUNT))
   )
     (asserts! (is-none (map-get? loans tx-sender)) ERR-ALREADY-HAS-LOAN)
     (asserts! (> collateral-amount u0) ERR-INVALID-AMOUNT)
     (asserts! (> borrow-amount u0) ERR-INVALID-AMOUNT)
     (asserts! (<= borrow-amount max-borrow) ERR-INSUFFICIENT-COLLATERAL)
+    ;; Ensure the protocol has enough liquidity to lend
     (asserts! (<= borrow-amount (var-get loan-pool-balance)) ERR-INSUFFICIENT-COLLATERAL)
 
-    ;; Lock collateral in contract
+    ;; Lock collateral in contract vault
     (try! (stx-transfer? collateral-amount tx-sender (as-contract tx-sender)))
 
-    ;; Send borrowed amount to borrower
+    ;; Send borrowed amount to borrower from protocol reserves
     (let ((borrower tx-sender))
       (try! (as-contract (stx-transfer? borrow-amount tx-sender borrower)))
     )
