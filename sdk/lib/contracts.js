@@ -78,6 +78,9 @@ const CLARITY_TYPES = {
 /**
  * Standard SIP-010 Trait Response types
  */
+/**
+ * Standard SIP-010 Trait Response types for Clarity integration.
+ */
 const SIP010_TYPES = {
     TRANSFER: 'transfer',
     GET_NAME: 'get-name',
@@ -89,7 +92,9 @@ const SIP010_TYPES = {
 };
 
 /**
- * Get a flat map of all contract addresses
+ * Retrieves a flattened map of all registered contract addresses.
+ * Useful for bulk registration in wallet or client applications.
+ * @returns {Object.<string, string>} A map of contract keys to their full Stacks addresses.
  */
 function getContractAddresses() {
     const addresses = {};
