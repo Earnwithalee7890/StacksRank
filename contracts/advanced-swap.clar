@@ -146,10 +146,14 @@
 ;; PUBLIC: LIQUIDITY
 ;; ───────────────────────────────────────────────────────────
 
-;; Create a new AMM pool (owner only seeding)
+;; @desc Create a new AMM pool (owner only seeding)
+;; @param initial-a: Initial amount of token A
+;; @param initial-b: Initial amount of token B
+;; @returns (response {pool-id: uint, lp-tokens-minted: uint} uint)
 (define-public (create-pool (initial-a uint) (initial-b uint))
   (let (
     (pool-id (+ (var-get pool-counter) u1))
+    ;; Geometric mean of initial liquidity
     (initial-lp (sqrti (* initial-a initial-b)))
   )
     (asserts! (is-eq tx-sender CONTRACT-OWNER) ERR-NOT-AUTHORIZED)
@@ -172,16 +176,19 @@
   )
 )
 
-;; Add liquidity proportionally and mint LP tokens
+;; @desc Add liquidity proportionally and mint LP tokens
+;; @param pool-id: The unique identifier for the pool
+;; @param amount-a: The amount of token A to add
+;; @param amount-b-max: Maximum amount of token B allowed (slippage protection)
 (define-public (add-liquidity (pool-id uint) (amount-a uint) (amount-b-max uint))
   (let (
     (pool (unwrap! (map-get? pools pool-id) ERR-POOL-NOT-FOUND))
     (res-a (get token-a-reserve pool))
     (res-b (get token-b-reserve pool))
     (total-lp (get total-lp-tokens pool))
-    ;; Proportional amount-b required
+    ;; Proportional amount-b required to maintain k
     (required-b (/ (* amount-a res-b) res-a))
-    ;; LP tokens to mint
+    ;; LP tokens to mint proportional to share of reserve-a
     (lp-mint (/ (* amount-a total-lp) res-a))
     (current-lp (get lp-tokens (get-lp-position pool-id tx-sender)))
   )
@@ -204,7 +211,9 @@
   )
 )
 
-;; Remove liquidity and burn LP tokens
+;; @desc Remove liquidity and burn LP tokens
+;; @param pool-id: The pool to remove liquidity from
+;; @param lp-amount: Number of LP tokens to burn
 (define-public (remove-liquidity (pool-id uint) (lp-amount uint))
   (let (
     (pool (unwrap! (map-get? pools pool-id) ERR-POOL-NOT-FOUND))
@@ -213,7 +222,7 @@
     (total-lp (get total-lp-tokens pool))
     (res-a (get token-a-reserve pool))
     (res-b (get token-b-reserve pool))
-    ;; Pro-rata token amounts
+    ;; Pro-rata token amounts based on share of total-lp
     (amount-a (/ (* lp-amount res-a) total-lp))
     (amount-b (/ (* lp-amount res-b) total-lp))
   )
