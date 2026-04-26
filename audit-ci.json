@@ -1,4 +1,12 @@
 {
-  "low": true,
-  "moderate": true
+  "$schema": "https://raw.githubusercontent.com/IBM/audit-ci/main/lib/config-schema.json",
+  "low": false,
+  "moderate": false,
+  "high": true,
+  "critical": true,
+  "allowlist": [
+    "GHSA-v88g-c8f8-3gpw",
+    "GHSA-pw2r-vq6v-5hp3",
+    "GHSA-72xf-g2v4-qvf3"
+  ]
 }
