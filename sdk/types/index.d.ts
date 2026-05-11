@@ -1,39 +1,42 @@
 /**
- * StacksRank SDK Types
+ * StacksRank SDK Type Definitions
  */
 
-export interface WalletInfo {
-    available: boolean;
-    provider: string | null;
+export interface ClarityTypeTags {
+    INT: number;
+    UINT: number;
+    BUFFER: number;
+    BOOL_TRUE: number;
+    BOOL_FALSE: number;
+    PRINCIPAL_STANDARD: number;
+    PRINCIPAL_CONTRACT: number;
+    RESPONSE_OK: number;
+    RESPONSE_ERR: number;
+    OPTIONAL_NONE: number;
+    OPTIONAL_SOME: number;
+    LIST: number;
+    TUPLE: number;
+    STRING_ASCII: number;
+    STRING_UTF8: number;
 }
 
-export interface NetworkInfo {
-    coreApiUrl: string;
-    chainId: number;
-    networkId: number;
-}
+export function encodeStringAscii(str: string): string;
+export function encodeStringUtf8(str: string): string;
+export function encodeUint(val: number | bigint | string): string;
+export function encodeInt(val: number | bigint | string): string;
+export function encodeBool(val: boolean): string;
+export function encodePrincipal(address: string): string;
+export function encodeBuffer(data: Uint8Array | number[]): string;
 
-export interface ContractCall {
-    contract: string;
-    functionName: string;
-    functionArgs?: string[];
-    network?: 'mainnet' | 'testnet';
-    appDetails?: object;
-}
+export function isValidStacksAddress(address: string): boolean;
+export function isValidContractName(name: string): boolean;
 
-export function detectWallet(): WalletInfo;
-export function connectWallet(): Promise<string>;
-export function callContract(options: ContractCall): Promise<any>;
-export function formatAddress(address: string, startChars?: number, endChars?: number): string;
-export function getBalance(address: string, network?: 'mainnet' | 'testnet'): Promise<number>;
+export function detectWallet(): Promise<boolean>;
+export function connectWallet(): Promise<string[]>;
+export function callContract(options: any): Promise<any>;
+export function formatAddress(address: string): string;
+export function getBalance(address: string): Promise<number>;
 
-export function isValidAddress(address: string): boolean;
-export function isValidContractId(contractId: string): boolean;
-export function isPositiveNumber(value: number | string): boolean;
-
-export const MAINNET: NetworkInfo;
-export const TESTNET: NetworkInfo;
-export const CONTRACTS: { [key: string]: string };
-
+export const CLARITY_TYPE_TAGS: ClarityTypeTags;
 export const version: string;
 export const name: string;
