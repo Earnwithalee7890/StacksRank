@@ -56,6 +56,12 @@ yarn-debug.log*
 yarn-error.log*
 logs/
 *.log
+activity_log.txt
+ci_log.txt
+
+# Coverage
+coverage/
+.nyc_output/
 
 # Diagnostic reports
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
@@ -63,5 +69,23 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # Optional REPL history
 .node_repl_history
 
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
 # Output of 'npm pack'
 *.tgz
+
+# Scratch scripts
+scratch/
+temp/
+
