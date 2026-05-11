@@ -66,6 +66,16 @@ assert(sdk.microToStx(1000000) === 1, 'microToStx(1000000) = 1');
 assert(sdk.stxToMicro(1) === 1000000, 'stxToMicro(1) = 1000000');
 assert(sdk.microToStx(500000) === 0.5, 'microToStx(500000) = 0.5');
 
+// Validation tests
+console.log('\n🛡️ Validation:');
+assert(sdk.isValidStacksAddress('SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7'), 'Valid standard principal');
+assert(sdk.isValidStacksAddress('SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7.my-contract'), 'Valid contract principal');
+assert(!sdk.isValidStacksAddress('InvalidAddress'), 'Invalid address fails');
+assert(!sdk.isValidStacksAddress('SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7.'), 'Incomplete contract principal fails');
+assert(sdk.isValidContractName('my-contract-123'), 'Valid contract name');
+assert(!sdk.isValidContractName('123-start-with-number'), 'Invalid contract name fails');
+
+
 // Summary
 console.log(`\n${'='.repeat(40)}`);
 console.log(`Results: ${passed} passed, ${failed} failed`);
