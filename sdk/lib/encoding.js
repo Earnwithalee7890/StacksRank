@@ -17,6 +17,8 @@
  * @module Encoding
  */
 
+const { CLARITY_TYPE_TAGS } = require('./constants');
+
 /**
  * Encode a Clarity string-ascii value to hex.
  * Format: 0x0d (type tag) + 4-byte big-endian length + UTF-8 bytes
@@ -33,7 +35,7 @@ function encodeStringAscii(str) {
     const bytes = new TextEncoder().encode(str);
     const len = bytes.length;
     const buf = new Uint8Array(5 + len);
-    buf[0] = 0x0d; // string-ascii type tag
+    buf[0] = CLARITY_TYPE_TAGS.STRING_ASCII;
     buf[1] = (len >> 24) & 0xff;
     buf[2] = (len >> 16) & 0xff;
     buf[3] = (len >> 8) & 0xff;
@@ -55,7 +57,7 @@ function encodeStringUtf8(str) {
     const bytes = new TextEncoder().encode(str);
     const len = bytes.length;
     const buf = new Uint8Array(5 + len);
-    buf[0] = 0x0e; // string-utf8 type tag
+    buf[0] = CLARITY_TYPE_TAGS.STRING_UTF8;
     buf[1] = (len >> 24) & 0xff;
     buf[2] = (len >> 16) & 0xff;
     buf[3] = (len >> 8) & 0xff;
@@ -76,7 +78,7 @@ function encodeUint(val) {
     let n = BigInt(val);
     if (n < 0n) throw new Error('encodeUint expects a non-negative value');
     const buf = new Uint8Array(17);
-    buf[0] = 0x01; // uint type tag
+    buf[0] = CLARITY_TYPE_TAGS.UINT;
     for (let i = 16; i >= 1; i--) {
         buf[i] = Number(n & 0xffn);
         n >>= 8n;
@@ -94,7 +96,7 @@ function encodeUint(val) {
 function encodeInt(val) {
     let n = BigInt(val);
     const buf = new Uint8Array(17);
-    buf[0] = 0x00; // int type tag
+    buf[0] = CLARITY_TYPE_TAGS.INT;
     // Handle negative via two's complement
     if (n < 0n) {
         n = (1n << 128n) + n;
@@ -113,7 +115,9 @@ function encodeInt(val) {
  * @returns {string} Hex-encoded Clarity value ("03" for true, "04" for false)
  */
 function encodeBool(val) {
-    return val ? '03' : '04'; // true = 0x03, false = 0x04
+    return val ? 
+        CLARITY_TYPE_TAGS.BOOL_TRUE.toString(16).padStart(2, '0') : 
+        CLARITY_TYPE_TAGS.BOOL_FALSE.toString(16).padStart(2, '0');
 }
 
 /**
@@ -149,7 +153,7 @@ function encodePrincipal(address) {
     
     // Build Clarity principal: 0x05 + version + hash160
     const buf = new Uint8Array(22);
-    buf[0] = 0x05; // standard principal type tag
+    buf[0] = CLARITY_TYPE_TAGS.PRINCIPAL_STANDARD;
     buf[1] = version;
     buf.set(hash160, 2);
     
@@ -167,7 +171,7 @@ function encodeBuffer(data) {
     const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
     const len = bytes.length;
     const buf = new Uint8Array(5 + len);
-    buf[0] = 0x02; // buffer type tag
+    buf[0] = CLARITY_TYPE_TAGS.BUFFER;
     buf[1] = (len >> 24) & 0xff;
     buf[2] = (len >> 16) & 0xff;
     buf[3] = (len >> 8) & 0xff;

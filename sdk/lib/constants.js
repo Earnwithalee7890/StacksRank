@@ -1,29 +1,27 @@
 /**
- * StacksRank SDK - Network Constants
+ * Clarity Type Tags and Constants
+ * 
+ * Based on the Stacks blockchain specification for Clarity value encoding.
  */
 
-const MAINNET = {
-    coreApiUrl: 'https://api.mainnet.hiro.so',
-    chainId: 1,
-    networkId: 1
-};
-
-const TESTNET = {
-    coreApiUrl: 'https://api.testnet.hiro.so',
-    chainId: 2147483648,
-    networkId: 2147483648
-};
-
-const CONTRACTS = {
-    REPUTATION: 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.simple-reputation',
-    SWAP: 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.simple-swap',
-    VAULT: 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.simple-vault',
-    BUILDER_TOOLS: 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.defi-builder-tools',
-    DISTRIBUTOR: 'SP2F500B8DTRK1EANJQ054BRAB8DDKN6QCMXGNFBT.stx-distributor'
+const CLARITY_TYPE_TAGS = {
+    INT: 0x00,
+    UINT: 0x01,
+    BUFFER: 0x02,
+    BOOL_TRUE: 0x03,
+    BOOL_FALSE: 0x04,
+    PRINCIPAL_STANDARD: 0x05,
+    PRINCIPAL_CONTRACT: 0x06,
+    RESPONSE_OK: 0x07,
+    RESPONSE_ERR: 0x08,
+    OPTIONAL_NONE: 0x09,
+    OPTIONAL_SOME: 0x0a,
+    LIST: 0x0b,
+    TUPLE: 0x0c,
+    STRING_ASCII: 0x0d,
+    STRING_UTF8: 0x0e
 };
 
 module.exports = {
-    MAINNET,
-    TESTNET,
-    CONTRACTS
+    CLARITY_TYPE_TAGS
 };
