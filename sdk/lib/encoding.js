@@ -1,16 +1,31 @@
 /**
- * StacksRank SDK - Clarity Value Encoding
+ * StacksRank SDK - Clarity Value Encoding Utilities
  * 
- * Pure JavaScript implementation for encoding Clarity values.
- * No external dependencies required.
+ * This module provides a pure JavaScript implementation for encoding common Clarity 
+ * data types into their hexadecimal representation, as used in the Stacks blockchain.
  * 
- * Supports: string-ascii, uint, int, bool, principal, buffer
+ * These functions are designed to be lightweight and have zero external dependencies,
+ * making them suitable for both browser and Node.js environments.
+ * 
+ * Supported Types:
+ * - String (ASCII & UTF-8)
+ * - Integers (Unsigned & Signed 128-bit)
+ * - Boolean
+ * - Principals (Standard Stacks addresses)
+ * - Buffers
+ * 
+ * @module Encoding
  */
 
 /**
  * Encode a Clarity string-ascii value to hex.
  * Format: 0x0d (type tag) + 4-byte big-endian length + UTF-8 bytes
+ * 
+ * @example
+ * encodeStringAscii("hello") // Returns "0d0000000568656c6c6f"
+ * 
  * @param {string} str - The ASCII string to encode
+ * @throws {Error} If the input is not a string
  * @returns {string} Hex-encoded Clarity value
  */
 function encodeStringAscii(str) {
@@ -30,7 +45,9 @@ function encodeStringAscii(str) {
 /**
  * Encode a Clarity string-utf8 value to hex.
  * Format: 0x0e (type tag) + 4-byte big-endian length + UTF-8 bytes
+ * 
  * @param {string} str - The UTF-8 string to encode
+ * @throws {Error} If the input is not a string
  * @returns {string} Hex-encoded Clarity value
  */
 function encodeStringUtf8(str) {
@@ -50,7 +67,9 @@ function encodeStringUtf8(str) {
 /**
  * Encode a Clarity uint128 value to hex.
  * Format: 0x01 (type tag) + 16-byte big-endian uint128
+ * 
  * @param {number|bigint|string} val - The unsigned integer to encode
+ * @throws {Error} If the input is negative
  * @returns {string} Hex-encoded Clarity value
  */
 function encodeUint(val) {
@@ -68,6 +87,7 @@ function encodeUint(val) {
 /**
  * Encode a Clarity int128 value to hex.
  * Format: 0x00 (type tag) + 16-byte big-endian int128 (two's complement)
+ * 
  * @param {number|bigint|string} val - The signed integer to encode
  * @returns {string} Hex-encoded Clarity value
  */
@@ -88,8 +108,9 @@ function encodeInt(val) {
 
 /**
  * Encode a Clarity bool value to hex.
+ * 
  * @param {boolean} val - The boolean to encode
- * @returns {string} Hex-encoded Clarity value
+ * @returns {string} Hex-encoded Clarity value ("03" for true, "04" for false)
  */
 function encodeBool(val) {
     return val ? '03' : '04'; // true = 0x03, false = 0x04
@@ -98,7 +119,9 @@ function encodeBool(val) {
 /**
  * Encode a Clarity standard principal to hex.
  * Format: 0x05 (type tag) + version byte + 20-byte hash160
+ * 
  * @param {string} address - Stacks address (e.g., "SP2J6Z...")
+ * @throws {Error} If the input is not a valid Stacks address format
  * @returns {string} Hex-encoded Clarity value
  */
 function encodePrincipal(address) {
@@ -136,6 +159,7 @@ function encodePrincipal(address) {
 /**
  * Encode a raw buffer to Clarity buffer hex.
  * Format: 0x02 (type tag) + 4-byte big-endian length + raw bytes
+ * 
  * @param {Uint8Array|number[]} data - The buffer data
  * @returns {string} Hex-encoded Clarity value
  */
@@ -161,3 +185,4 @@ module.exports = {
     encodePrincipal,
     encodeBuffer
 };
+
