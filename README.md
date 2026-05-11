@@ -97,6 +97,20 @@ This project leverages the bleeding edge of the Stacks ecosystem:
 
 ---
 
+## 📚 Documentation & Guides
+
+For more detailed technical information, check out these specialized documentation files:
+
+- **[Project Architecture](./ARCHITECTURE.md)**: Deep dive into the system design and data flow.
+- **[Contract Deployment Guide](./CONTRACT_DEPLOYMENT.md)**: Instructions for deploying and verifying contracts.
+- **[Clarity 2.0 Fixes](./CLARITY2_FIX.md)**: Common fixes and patterns for Clarity development.
+- **[Leather Wallet Integration](./LEATHER_WALLET_INTEGRATION.md)**: Detailed guide on supporting Leather.
+- **[Stacks Builder Rewards Guide](./STACKS_BUILDER_REWARDS_GUIDE.md)**: Comprehensive guide for the rewards campaign.
+- **[Quickstart Guide](./QUICKSTART.md)**: Get up and running in under 5 minutes.
+- **[Security Policy](./SECURITY.md)**: How we handle vulnerability reporting and audits.
+
+---
+
 ## 🗺️ Roadmap & Future Growth
 
 We are constantly building. Check out our [**Full Project Roadmap**](./ROADMAP.md) to see what's coming next, including SIP-010 expansion, DAO governance, and advanced vault features.
@@ -106,12 +120,6 @@ We are constantly building. Check out our [**Full Project Roadmap**](./ROADMAP.m
 ## 🤝 Contributing
 
 We welcome contributions! Please read our [Contributing Guide](./CONTRIBUTING.md) before submitting a PR.
-
-1.  Fork the Project
-2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4.  Push to the Branch (`git push origin feature/AmazingFeature`)
-5.  Open a Pull Request
 
 ---
 
